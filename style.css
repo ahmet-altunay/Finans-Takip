@@ -190,20 +190,27 @@ th {
 /* Mobil uyum */
 @media (max-width: 600px) {
   body {
-    font-size: 16px;
+    font-size: 18px;   /* yazılar biraz daha büyük */
+  }
+  h1, h2, h3 {
+    font-size: 22px;   /* başlıklar büyütüldü */
   }
   form {
     margin: 10px;
   }
   input, select, button {
-    padding: 8px;
-    font-size: 14px;
+    padding: 14px;     /* dokunmatik için daha geniş */
+    font-size: 16px;   /* yazılar daha okunaklı */
   }
   #report {
-    font-size: 15px;
+    font-size: 16px;
   }
   .menu button {
-    font-size: 16px;
-    padding: 12px;
+    font-size: 18px;   /* menü butonları büyütüldü */
+    padding: 16px;
+  }
+  #recordsList li {
+    font-size: 16px;   /* kayıt listesi yazıları büyütüldü */
   }
 }
+
