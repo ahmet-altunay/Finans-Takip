@@ -150,19 +150,19 @@ function displayRecords() {
   transactions.forEach((t, index) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${t.date}</td>
-      <td>${t.type}</td>
-      <td>${t.category}</td>
-      <td>${t.note}</td>
-      <td>${t.amount.toFixed(2)}</td>
-      <td>${t.accountId}</td>
-      <td>${t.installments}</td>
-      <td>${t.dueDate || ""}</td>
-      <td class="actions">
-        <button onclick="editRecord(${index})">Düzenle</button>
-        <button onclick="deleteRecord(${index})">Sil</button>
-      </td>
-    `;
+  <td>${t.date}</td>
+  <td>${t.type}</td>
+  <td>${t.category}</td>
+  <td>${t.note}</td>
+  <td>${t.amount ? t.amount.toFixed(2) : ""}</td>
+  <td>${t.accountId}</td>
+  <td>${t.installments}</td>
+  <td>${t.dueDate ? t.dueDate : ""}</td>
+  <td class="actions">
+    <button onclick="editRecord(${index})">Düzenle</button>
+    <button onclick="deleteRecord(${index})">Sil</button>
+  </td>
+`;
     recordsList.appendChild(row);
   });
 }
