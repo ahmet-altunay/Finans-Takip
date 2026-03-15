@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Rapor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+ <h1>Raporlar</h1>
+
+ <label>1. Ay Seç:</label>
+ <select id="monthSelect1"></select>
+
+ <label>2. Ay Seç:</label>
+ <select id="monthSelect2"></select>
+
+ <button onclick="compareReports()">Karşılaştır</button>
+
+ <div id="report"></div>
+
+ <nav class="menu">
+   <button onclick="location.href='index.html'">Ana Sayfa</button>
+   <button onclick="location.href='add.html'">Kayıt Ekle</button>
+   <button onclick="location.href='records.html'">Kayıtlar</button>
+   <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
+ </nav>
+
+ <script src="app.js"></script>
+ <script>
+   displayReport();
+ </script>
+</body>
+</html>

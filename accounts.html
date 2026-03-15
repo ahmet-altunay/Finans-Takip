@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Hesap/Kartlar</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Hesap/Kart Yönetimi</h1>
+
+  <form id="accountForm">
+    <label>Yeni Hesap/Kart Adı:</label>
+    <input type="text" id="newAccount" required>
+    <button type="submit">Ekle</button>
+  </form>
+
+  <ul id="accountList"></ul>
+
+  <nav class="menu">
+    <button onclick="location.href='index.html'">Ana Sayfa</button>
+    <button onclick="location.href='add.html'">Kayıt Ekle</button>
+    <button onclick="location.href='records.html'">Kayıtlar</button>
+    <button onclick="location.href='report.html'">Raporlar</button>
+    <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
+  </nav>
+
+  <script src="app.js"></script>
+  <script>
+    displayAccounts();
+  </script>
+</body>
+</html>
