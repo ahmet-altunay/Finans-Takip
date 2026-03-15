@@ -5,35 +5,17 @@
   <title>Hesap/Kartlar</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <h1>Hesap/Kart Yönetimi</h1>
-
-  <!-- Yeni Hesap/Kart Ekleme -->
-  <form id="accountForm">
-    <label for="newAccount">Yeni Hesap/Kart Adı:</label>
-    <input type="text" id="newAccount" required>
-
-    <label for="dueDate">Son Ödeme Tarihi (Kredi Kartı için):</label>
-    <input type="date" id="dueDate">
-
-    <button type="submit">Ekle</button>
-  </form>
-
-  <!-- Hesap/Kart Listesi -->
+<body onload="displayAccounts()">
+  <h1>Hesap/Kartlar</h1>
   <ul id="accountList"></ul>
 
-  <!-- Menü -->
   <nav class="menu">
     <button onclick="location.href='index.html'">Ana Sayfa</button>
     <button onclick="location.href='add.html'">Kayıt Ekle</button>
     <button onclick="location.href='records.html'">Kayıtlar</button>
     <button onclick="location.href='report.html'">Raporlar</button>
-    <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
   </nav>
 
   <script src="app.js"></script>
-  <script>
-    displayAccounts();
-  </script>
 </body>
 </html>

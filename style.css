@@ -1,225 +1,33 @@
-/* Genel tema */
 body {
   font-family: Arial, sans-serif;
-  margin: 10px;
-  padding: 0;
-  background-color: #2f2f2f;
-  color: #f0f0f0;
+  margin: 20px;
+  background: #f9f9f9;
 }
 
-h1, h2, h3 {
-  text-align: center;
-  color: #ffffff;
+h1 {
+  color: #333;
+}
+
+.menu {
   margin-top: 20px;
 }
 
-/* Tarih ve saat */
-#date, #clock {
-  text-align: center;
-  font-size: 22px;
-  margin: 5px 0;
-  color: #dcdcdc;
-}
-
-/* Bakiyeler */
-#balances {
-  text-align: center;
-  margin: 15px 0;
-  font-size: 18px;
-  color: #e0e0e0;
-}
-
-/* Formlar */
-form {
-  margin: 20px;
-}
-
-label {
-  display: block;
-  margin-top: 10px;
-  color: #f0f0f0;
-}
-
-input, select, button {
-  margin: 5px 0;
-  padding: 10px;
-  width: 100%;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background-color: #3a3a3a;
-  color: #fff;
-}
-
-button {
-  background-color: #555;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #777;
-}
-
-/* Menü */
-.menu {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .menu button {
-  padding: 15px;
-  font-size: 18px;
-  background-color: #555;
-  color: #fff;
+  margin-right: 10px;
+  padding: 8px 12px;
+  background: #0078d7;
+  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
   cursor: pointer;
-  width: 100%;
 }
 
 .menu button:hover {
-  background-color: #777;
+  background: #005a9e;
 }
 
-/* Rapor kutusu */
-#report {
-  background-color: #3a3a3a;
-  padding: 15px;
-  border-radius: 8px;
-  margin: 20px;
-  font-size: 16px;
-  line-height: 1.6;
-}
+.type-gelir { color: green; font-weight: bold; }
+.type-gider { color: red; font-weight: bold; }
+.type-transfer { color: blue; font-weight: bold; }
 
-#report h3 {
-  margin-top: 15px;
-  color: #dcdcdc;
-}
-
-#report strong {
-  display: block;
-  margin-top: 5px;
-  color: #fff;
-}
-
-/* Kayıt listesi */
-#recordsList {
-  list-style: none;
-  padding: 0;
-}
-
-#recordsList li {
-  background-color: #3a3a3a;
-  margin: 8px 0;
-  padding: 10px;
-  border-radius: 6px;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* Tür etiketleri */
-.type-income {
-  color: #4CAF50; /* yeşil */
-  font-weight: bold;
-}
-.type-expense {
-  color: #d9534f; /* kırmızı */
-  font-weight: bold;
-}
-.type-transfer {
-  color: #1e90ff; /* mavi */
-  font-weight: bold;
-}
-
-/* Son ödeme tarihi */
-.due-date {
-  color: orange;
-  font-weight: bold;
-  margin-left: 10px;
-}
-
-/* Sil/Düzenle butonları */
-.edit-btn, .delete-btn {
-  padding: 8px 12px;
-  margin-left: 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.edit-btn {
-  background-color: #4CAF50;
-  color: white;
-}
-
-.edit-btn:hover {
-  background-color: #45a049;
-}
-
-.delete-btn {
-  background-color: #d9534f;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #c9302c;
-}
-
-/* Tablo */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-  display: block;
-  overflow-x: auto;
-  white-space: nowrap;
-}
-
-th, td {
-  border: 1px solid #444;
-  padding: 10px;
-  text-align: center;
-  background-color: #3a3a3a;
-  color: #fff;
-}
-
-th {
-  background-color: #555;
-}
-
-/* Uyarı mesajı */
-#categoryMessage {
-  margin-top: 5px;
-  font-size: 14px;
-  font-weight: bold;
-  color: orange;
-}
-
-/* 📱 Mobil uyum */
-@media (max-width: 600px) {
-  body {
-    font-size: 18px;
-  }
-  h1, h2, h3 {
-    font-size: 22px;
-  }
-  input, select, button {
-    padding: 14px;
-    font-size: 16px;
-  }
-  .menu button {
-    font-size: 18px;
-    padding: 16px;
-  }
-  #recordsList li {
-    font-size: 16px;
-  }
-  #report {
-    font-size: 16px;
-  }
-}
+.due-date { color: orange; font-weight: bold; }

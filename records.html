@@ -5,13 +5,10 @@
   <title>Kayıtlar</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="displayRecords()">
   <h1>Kayıtlar</h1>
-
-  <!-- Kayıtlar listesi -->
   <ul id="recordsList"></ul>
 
-  <!-- Menü -->
   <nav class="menu">
     <button onclick="location.href='index.html'">Ana Sayfa</button>
     <button onclick="location.href='add.html'">Kayıt Ekle</button>
@@ -20,9 +17,5 @@
   </nav>
 
   <script src="app.js"></script>
-  <script>
-    // Doğru fonksiyon çağrısı
-    displayRecords();
-  </script>
 </body>
 </html>

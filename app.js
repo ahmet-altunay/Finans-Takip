@@ -3,16 +3,48 @@ let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
 // Hesap/Kartlar
 let accounts = JSON.parse(localStorage.getItem("accounts")) || [
-  { name: "Cüzdan" },
-  { name: "Ziraat Bankası" },
-  { name: "İş Bankası" },
-  { name: "Garanti Bonus", dueDate: "" },
-  { name: "Akbank Axess", dueDate: "" }
+  { name: "ENPARA Kredi Kartı", dueDate: "" },
+  { name: "ENPARA Vd.siz TL" },
+  { name: "Halkbank Kredi Kartı", dueDate: "" },
+  { name: "Nakit" }
 ];
 
 // Kategoriler
-let incomeCategories = JSON.parse(localStorage.getItem("incomeCategories")) || ["Maaş", "Ek Gelir", "Faiz Geliri"];
-let expenseCategories = JSON.parse(localStorage.getItem("expenseCategories")) || ["Akaryakıt", "Yeme-İçme", "Fatura", "Eğlence", "Kişisel Bakım"];
+let incomeCategories = JSON.parse(localStorage.getItem("incomeCategories")) || [
+  "Aile Destek Geliri",
+  "Ders Ücreti Geliri",
+  "Maaş Geliri",
+  "Para Üstü Geliri",
+  "TOKİ - Depozit"
+];
+
+let expenseCategories = JSON.parse(localStorage.getItem("expenseCategories")) || [
+  "Akaryakıt Gideri",
+  "Araç Devir Ücreti",
+  "Araç Sigorta",
+  "Araç Tamir Bakım",
+  "Araç Vergi",
+  "Arda Harici Gider",
+  "Arda Nafaka Bedeli",
+  "Babam İçin Harcanan",
+  "Banka-Faiz Gideri",
+  "Ehliyet Yenileme",
+  "Ev Gideri",
+  "Haberleşme",
+  "İlaç-Sağlık Gideri",
+  "Kişisel Bakım",
+  "Küçük Demirbaş Gideri",
+  "TOKİ - Depozit",
+  "Ulaşım Gideri",
+  "Yatırım",
+  "Yeme-İçme Gideri",
+  "Yurtdışı Harcama"
+];
+
+let transferCategories = JSON.parse(localStorage.getItem("transferCategories")) || [
+  "Aday Ödemesi",
+  "Aile İçi Transfer"
+];
 
 // Saat ve tarih
 function startClock() {
@@ -21,8 +53,8 @@ function startClock() {
 
   function updateTime() {
     const now = new Date();
-    dateDiv.textContent = now.toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-    clockDiv.textContent = now.toLocaleTimeString("tr-TR");
+    if (dateDiv) dateDiv.textContent = now.toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    if (clockDiv) clockDiv.textContent = now.toLocaleTimeString("tr-TR");
   }
 
   updateTime();
@@ -52,24 +84,26 @@ function populateCategories() {
   categorySelect.innerHTML = "";
 
   if (type === "Gelir") {
-    [...incomeCategories].sort().forEach(cat => {
+    incomeCategories.forEach(cat => {
       const option = document.createElement("option");
       option.value = cat;
       option.textContent = cat;
       categorySelect.appendChild(option);
     });
   } else if (type === "Gider") {
-    [...expenseCategories].sort().forEach(cat => {
+    expenseCategories.forEach(cat => {
       const option = document.createElement("option");
       option.value = cat;
       option.textContent = cat;
       categorySelect.appendChild(option);
     });
   } else if (type === "Transfer") {
-    const option = document.createElement("option");
-    option.value = "Hesaplar Arası";
-    option.textContent = "Hesaplar Arası";
-    categorySelect.appendChild(option);
+    transferCategories.forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.appendChild(option);
+    });
   }
 
   // Hesap/Kart dropdown
@@ -107,7 +141,7 @@ function addCategory() {
 
   newCat = newCat.charAt(0).toUpperCase() + newCat.slice(1).toLowerCase();
 
-  let list = type === "Gelir" ? incomeCategories : expenseCategories;
+  let list = type === "Gelir" ? incomeCategories : (type === "Gider" ? expenseCategories : transferCategories);
 
   if (list.includes(newCat)) {
     message.textContent = "⚠️ Bu kategori zaten mevcut!";
@@ -118,8 +152,10 @@ function addCategory() {
   list.push(newCat);
   if (type === "Gelir") {
     localStorage.setItem("incomeCategories", JSON.stringify(list));
-  } else {
+  } else if (type === "Gider") {
     localStorage.setItem("expenseCategories", JSON.stringify(list));
+  } else {
+    localStorage.setItem("transferCategories", JSON.stringify(list));
   }
 
   document.getElementById("newCategory").value = "";
@@ -206,24 +242,4 @@ function displayAccounts() {
 }
 
 // Rapor ekranı
-function displayReport() {
-  const reportDiv = document.getElementById("report");
-  const selectedMonth = document.getElementById("monthSelect")?.value;
-  if (!reportDiv || !selectedMonth) return;
-
-  const [year, month] = selectedMonth.split("-");
-  const filtered = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getFullYear() == year && (d.getMonth() + 1) == parseInt(month);
-  });
-
-  let incomeTotal = 0, expenseTotal = 0;
-  const incomeCats = {};
-  const expenseCats = {};
-  const transfers = [];
-  const dueDates = [];
-
-  filtered.forEach(t => {
-    if (t.type === "Gelir") {
-      incomeTotal += t.amount;
-      incomeCats[t.category] = (incomeCats
+function display

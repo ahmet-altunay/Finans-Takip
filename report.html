@@ -7,26 +7,11 @@
 </head>
 <body>
   <h1>Raporlar</h1>
+  <label for="monthSelect">Ay Seç:</label>
+  <input type="month" id="monthSelect" onchange="displayReport()">
 
-  <!-- Tek Ay Raporu -->
-  <label>Ay Seç:</label>
-  <select id="monthSelect"></select>
-  <button onclick="displayReport()">Raporu Göster</button>
-
-  <!-- İki Ay Karşılaştırma -->
-  <h2>Ay Karşılaştırma</h2>
-  <label>1. Ay Seç:</label>
-  <select id="monthSelect1"></select>
-
-  <label>2. Ay Seç:</label>
-  <select id="monthSelect2"></select>
-
-  <button onclick="compareReports()">Karşılaştır</button>
-
-  <!-- Rapor Çıktısı -->
   <div id="report"></div>
 
-  <!-- Menü -->
   <nav class="menu">
     <button onclick="location.href='index.html'">Ana Sayfa</button>
     <button onclick="location.href='add.html'">Kayıt Ekle</button>
@@ -35,13 +20,5 @@
   </nav>
 
   <script src="app.js"></script>
-  <script>
-    // Sayfa açıldığında ay listelerini doldur
-    window.onload = function() {
-      populateMonthSelect("monthSelect");
-      populateMonthSelect("monthSelect1");
-      populateMonthSelect("monthSelect2");
-    };
-  </script>
 </body>
 </html>
