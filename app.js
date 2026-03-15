@@ -242,4 +242,4 @@ function displayAccounts() {
 }
 
 // Rapor ekranı
-function display
+function displayReport
