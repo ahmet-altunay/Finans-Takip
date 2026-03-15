@@ -226,6 +226,4 @@ function displayReport() {
   filtered.forEach(t => {
     if (t.type === "Gelir") {
       incomeTotal += t.amount;
-      incomeCats[t.category] = (incomeCats[t.category] || 0) + t.amount;
-    } else if (t.type
-      
+      incomeCats[t.category] = (incomeCats
