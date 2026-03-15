@@ -12,11 +12,12 @@
     <label>Tarih:</label>
     <input type="date" id="dateInput" required>
 
-    <label>Tür:</label>
-    <select id="type" onchange="populateCategories()">
-      <option value="income">Gelir</option>
-      <option value="expense">Gider</option>
-    </select>
+    <label for="type">Tür:</label>
+<select id="type" name="type">
+  <option value="Gelir">Gelir</option>
+  <option value="Gider">Gider</option>
+  <option value="Transfer">Transfer</option>
+</select>
 
     <label>Kategori:</label>
     <div style="display:flex; gap:8px; align-items:center;">

@@ -44,14 +44,27 @@ function populateCategories() {
   if (!categorySelect) return;
 
   categorySelect.innerHTML = "";
-  const cats = type === "income" ? [...incomeCategories].sort() : [...expenseCategories].sort();
 
-  cats.forEach(cat => {
+  if (type === "Gelir") {
+    [...incomeCategories].sort().forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.appendChild(option);
+    });
+  } else if (type === "Gider") {
+    [...expenseCategories].sort().forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.appendChild(option);
+    });
+  } else if (type === "Transfer") {
     const option = document.createElement("option");
-    option.value = cat;
-    option.textContent = cat;
+    option.value = "Hesaplar Arası";
+    option.textContent = "Hesaplar Arası";
     categorySelect.appendChild(option);
-  });
+  }
 
   // Hesap/Kart dropdown
   const accountSelect = document.getElementById("account");
@@ -68,7 +81,7 @@ function populateCategories() {
   // Taksit bölümü
   const installmentSection = document.getElementById("installmentSection");
   if (installmentSection) {
-    installmentSection.style.display = (type === "expense") ? "block" : "none";
+    installmentSection.style.display = (type === "Gider") ? "block" : "none";
   }
 }
 
@@ -86,10 +99,9 @@ function addCategory() {
 
   if (!newCat) return;
 
-  // İlk harfi büyük yap, geri kalan küçük bırak
   newCat = newCat.charAt(0).toUpperCase() + newCat.slice(1).toLowerCase();
 
-  let list = type === "income" ? incomeCategories : expenseCategories;
+  let list = type === "Gelir" ? incomeCategories : expenseCategories;
 
   if (list.includes(newCat)) {
     message.textContent = "⚠️ Bu kategori zaten mevcut!";
@@ -98,7 +110,7 @@ function addCategory() {
   }
 
   list.push(newCat);
-  if (type === "income") {
+  if (type === "Gelir") {
     localStorage.setItem("incomeCategories", JSON.stringify(list));
   } else {
     localStorage.setItem("expenseCategories", JSON.stringify(list));
@@ -185,16 +197,17 @@ function displayReport() {
   let incomeTotal = 0, expenseTotal = 0;
   const incomeCats = {};
   const expenseCats = {};
-  const accountExpenses = {};
+  const transfers = [];
 
   filtered.forEach(t => {
-    if (t.type === "income") {
+    if (t.type === "Gelir") {
       incomeTotal += t.amount;
       incomeCats[t.category] = (incomeCats[t.category] || 0) + t.amount;
-    } else if (t.type === "expense") {
+    } else if (t.type === "Gider") {
       expenseTotal += t.amount;
       expenseCats[t.category] = (expenseCats[t.category] || 0) + t.amount;
-      accountExpenses[t.accountId] = (accountExpenses[t.accountId] || 0) + t.amount;
+    } else if (t.type === "Transfer") {
+      transfers.push(t);
     }
   });
 
@@ -208,4 +221,9 @@ function displayReport() {
   html += `<strong>Toplam Gelir: ${incomeTotal} TL</strong><br><br>`;
 
   html += `<h3>Gider Kategorileri</h3>`;
-  for (const cat in expenseCats) html += `- ${cat}: ${
+  for (const cat in expenseCats) html += `- ${cat}: ${expenseCats[cat]} TL<br>`;
+  html += `<strong>Toplam Gider: ${expenseTotal} TL</strong><br><br>`;
+
+  html += `<h3 style="color:${netColor}">Net Durum: ${net} TL</h3><br>`;
+
+  if
