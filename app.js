@@ -11,11 +11,7 @@ let accounts = JSON.parse(localStorage.getItem("accounts")) || [
 ];
 
 let incomeCategories = JSON.parse(localStorage.getItem("incomeCategories")) || [
-  "Aile Destek Geliri",
-  "Ders Ücreti Geliri",
-  "Maaş Geliri",
-  "Para Üstü Geliri",
-  "TOKİ - Depozit"
+  "Aile Destek Geliri","Ders Ücreti Geliri","Maaş Geliri","Para Üstü Geliri","TOKİ - Depozit"
 ];
 
 let expenseCategories = JSON.parse(localStorage.getItem("expenseCategories")) || [
@@ -35,7 +31,6 @@ let transferCategories = JSON.parse(localStorage.getItem("transferCategories")) 
 function startClock() {
   const dateDiv = document.getElementById("date");
   const clockDiv = document.getElementById("clock");
-
   function updateTime() {
     const now = new Date();
     if (dateDiv) dateDiv.textContent = now.toLocaleDateString("tr-TR",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
@@ -219,3 +214,4 @@ function displayReport() {
   reportDiv.innerHTML=`
     <p>Gelir: ${gelir} TL</p>
     <p>Gider: ${gider} TL</p>
+    <p>Transfer: ${transfer} TL</
