@@ -4,13 +4,53 @@
   <meta charset="UTF-8">
   <title>Raporlar</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    section {
+      margin-top: 20px;
+    }
+    h2 {
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
 </head>
 <body>
   <h1>Raporlar</h1>
+
   <label for="monthSelect">Ay Seç:</label>
   <input type="month" id="monthSelect" onchange="displayReport()">
 
-  <div id="report"></div>
+  <!-- Gelir/Gider Raporu -->
+  <section>
+    <h2>Gelir ve Giderler</h2>
+    <div id="incomeExpenseReport"></div>
+  </section>
+
+  <!-- Kredi Kartı Borçları -->
+  <section>
+    <h2>Kredi Kartı Borçları</h2>
+    <div id="creditCardReport"></div>
+  </section>
+
+  <!-- Anlık Bakiyeler -->
+  <section>
+    <h2>Anlık Bakiyeler</h2>
+    <div id="balancesReport"></div>
+  </section>
 
   <nav class="menu">
     <button onclick="location.href='index.html'">Ana Sayfa</button>

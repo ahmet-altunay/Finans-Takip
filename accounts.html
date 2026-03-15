@@ -4,10 +4,78 @@
   <meta charset="UTF-8">
   <title>Hesap/Kartlar</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    form {
+      display: flex;
+      flex-direction: column;
+      max-width: 400px;
+    }
+    label {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input, select, button {
+      margin-top: 5px;
+      padding: 6px;
+      font-size: 14px;
+    }
+    #dueDateSection {
+      display: none;
+      margin-top: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
 </head>
 <body onload="displayAccounts()">
   <h1>Hesap/Kartlar</h1>
-  <ul id="accountList"></ul>
+
+  <!-- Yeni Hesap/Kart Ekle -->
+  <form id="accountForm">
+    <label for="accountName">Hesap/Kart Adı:</label>
+    <input type="text" id="accountName" required>
+
+    <label for="accountType">Tür:</label>
+    <select id="accountType" onchange="toggleDueDate()">
+      <option value="Banka Hesabı">Banka Hesabı</option>
+      <option value="Nakit">Nakit</option>
+      <option value="Kredi Kartı">Kredi Kartı</option>
+    </select>
+
+    <!-- Kredi Kartı için Son Ödeme Günü -->
+    <div id="dueDateSection">
+      <label for="dueDay">Son Ödeme Günü:</label>
+      <input type="number" id="dueDay" min="1" max="31" placeholder="örn: 10">
+    </div>
+
+    <button type="submit">Kaydet</button>
+  </form>
+
+  <!-- Mevcut Hesap/Kartlar -->
+  <h2>Mevcut Hesap/Kartlar</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Adı</th>
+        <th>Tür</th>
+        <th>Son Ödeme Günü</th>
+      </tr>
+    </thead>
+    <tbody id="accountsList">
+      <!-- Hesaplar app.js tarafından buraya eklenecek -->
+    </tbody>
+  </table>
 
   <nav class="menu">
     <button onclick="location.href='index.html'">Ana Sayfa</button>

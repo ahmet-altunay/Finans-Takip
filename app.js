@@ -1,217 +1,220 @@
-// =====================
-// VERİLERİN TANIMLANMASI
-// =====================
+// ===================== GENEL =====================
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
 
-let accounts = JSON.parse(localStorage.getItem("accounts")) || [
-  { name: "ENPARA Kredi Kartı", dueDate: "" },
-  { name: "ENPARA Vd.siz TL" },
-  { name: "Halkbank Kredi Kartı", dueDate: "" },
-  { name: "Nakit" }
-];
-
-let incomeCategories = JSON.parse(localStorage.getItem("incomeCategories")) || [
-  "Aile Destek Geliri","Ders Ücreti Geliri","Maaş Geliri","Para Üstü Geliri","TOKİ - Depozit"
-];
-
-let expenseCategories = JSON.parse(localStorage.getItem("expenseCategories")) || [
-  "Akaryakıt Gideri","Araç Devir Ücreti","Araç Sigorta","Araç Tamir Bakım","Araç Vergi",
-  "Arda Harici Gider","Arda Nafaka Bedeli","Babam İçin Harcanan","Banka-Faiz Gideri",
-  "Ehliyet Yenileme","Ev Gideri","Haberleşme","İlaç-Sağlık Gideri","Kişisel Bakım",
-  "Küçük Demirbaş Gideri","TOKİ - Depozit","Ulaşım Gideri","Yatırım","Yeme-İçme Gideri","Yurtdışı Harcama"
-];
-
-let transferCategories = JSON.parse(localStorage.getItem("transferCategories")) || [
-  "Aday Ödemesi","Aile İçi Transfer"
-];
-
-// =====================
-// SAAT VE TARİH
-// =====================
+// Canlı saat ve tarih
 function startClock() {
-  const dateDiv = document.getElementById("date");
-  const clockDiv = document.getElementById("clock");
-  function updateTime() {
+  function updateClock() {
     const now = new Date();
-    if (dateDiv) dateDiv.textContent = now.toLocaleDateString("tr-TR",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-    if (clockDiv) clockDiv.textContent = now.toLocaleTimeString("tr-TR");
+    const dateStr = now.toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    const timeStr = now.toLocaleTimeString("tr-TR");
+    document.getElementById("date").textContent = dateStr;
+    document.getElementById("clock").textContent = timeStr;
   }
-  updateTime();
-  setInterval(updateTime,1000);
+  updateClock();
+  setInterval(updateClock, 1000);
 }
 
-// =====================
-// BAKİYE GÖSTERİMİ
-// =====================
-function showBalances() {
-  const balancesDiv = document.getElementById("balances");
-  if (!balancesDiv) return;
-  let html = "";
-  accounts.forEach(acc => { html += `${acc.name}: 0 TL<br>`; });
-  balancesDiv.innerHTML = html;
-}
-showBalances();
+// ===================== ADD.HTML =====================
 
-// =====================
-// KATEGORİLERİ DOLDURMA
-// =====================
+// Kategori mantığı
 function populateCategories() {
-  const type = document.getElementById("type")?.value;
+  const type = document.getElementById("type").value;
   const categorySelect = document.getElementById("category");
-  if (!categorySelect) return;
   categorySelect.innerHTML = "";
 
-  let list = [];
-  if (type === "Gelir") list = incomeCategories;
-  else if (type === "Gider") list = expenseCategories;
-  else if (type === "Transfer") list = transferCategories;
+  let categories = [];
+  if (type === "Gelir") categories = ["Maaş", "Ek Gelir"];
+  else if (type === "Gider") categories = ["Market", "Fatura", "Ulaşım", "Eğlence"];
+  else if (type === "Transfer") categories = ["Hesaplar Arası"];
 
-  list.forEach(cat => {
-    const option = document.createElement("option");
-    option.value = cat;
-    option.textContent = cat;
-    categorySelect.appendChild(option);
+  categories.forEach(cat => {
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categorySelect.appendChild(opt);
   });
-
-  const accountSelect = document.getElementById("account");
-  if (accountSelect) {
-    accountSelect.innerHTML = "";
-    accounts.forEach(acc => {
-      const option = document.createElement("option");
-      option.value = acc.name;
-      option.textContent = acc.name;
-      accountSelect.appendChild(option);
-    });
-  }
-
-  const installmentSection = document.getElementById("installmentSection");
-  if (installmentSection) installmentSection.style.display = (type==="Gider")?"block":"none";
 }
 
-// =====================
-// YENİ KATEGORİ EKLEME
-// =====================
 function showCategoryInput() {
-  document.getElementById("newCategoryDiv").style.display="block";
-  document.getElementById("categoryMessage").style.display="none";
+  document.getElementById("newCategoryDiv").style.display = "block";
 }
 
 function addCategory() {
-  const type = document.getElementById("type").value;
-  let newCat = document.getElementById("newCategory").value.trim();
-  const message = document.getElementById("categoryMessage");
-  if (!newCat) return;
-  newCat = newCat.charAt(0).toUpperCase()+newCat.slice(1).toLowerCase();
-
-  let list = type==="Gelir"?incomeCategories:(type==="Gider"?expenseCategories:transferCategories);
-  if (list.includes(newCat)) {
-    message.textContent="⚠️ Bu kategori zaten mevcut!";
-    message.style.display="block"; return;
+  const newCat = document.getElementById("newCategory").value.trim();
+  if (newCat) {
+    const categorySelect = document.getElementById("category");
+    const opt = document.createElement("option");
+    opt.value = newCat;
+    opt.textContent = newCat;
+    categorySelect.appendChild(opt);
+    categorySelect.value = newCat;
+    document.getElementById("categoryMessage").textContent = "Kategori eklendi.";
+    document.getElementById("categoryMessage").style.display = "block";
   }
-  list.push(newCat);
-  localStorage.setItem(type==="Gelir"?"incomeCategories":type==="Gider"?"expenseCategories":"transferCategories",JSON.stringify(list));
-  document.getElementById("newCategory").value="";
-  document.getElementById("newCategoryDiv").style.display="none";
-  message.style.display="none";
-  populateCategories();
 }
 
-// =====================
-// KAYIT EKLEME
-// =====================
-document.getElementById("transactionForm")?.addEventListener("submit",function(e){
-  e.preventDefault();
-  const type=document.getElementById("type").value;
-  const amount=parseFloat(document.getElementById("amount").value);
-  const category=document.getElementById("category").value;
-  const note=document.getElementById("note").value;
-  const accountId=document.getElementById("account").value;
-  const date=document.getElementById("dateInput").value;
-  const installments=parseInt(document.getElementById("installments")?.value||0);
-  const dueDate=document.getElementById("dueDate")?.value||"";
-  const receiptFile=document.getElementById("receiptFile")?.value||"";
+// Hesap/Kart dropdown
+function loadAccountsDropdown() {
+  const accountSelect = document.getElementById("account");
+  accountSelect.innerHTML = "";
+  accounts.forEach(acc => {
+    const opt = document.createElement("option");
+    opt.value = acc.name;
+    opt.textContent = acc.name;
+    accountSelect.appendChild(opt);
+  });
+}
 
-  const transaction={type,amount,category,note,accountId,date,installments,dueDate,receiptFile};
-  transactions.push(transaction);
-  localStorage.setItem("transactions",JSON.stringify(transactions));
-  alert("Kayıt başarıyla eklendi!");
-  displayRecords(); displayReport();
+// Taksit mantığı
+function toggleInstallments() {
+  const account = document.getElementById("account").value;
+  const section = document.getElementById("installmentSection");
+  if (account.includes("ENPARA Kredi Kartı") || account.includes("Halkbank Kredi Kartı") || account.includes("Kredi Kartı")) {
+    section.style.display = "block";
+  } else {
+    section.style.display = "none";
+    document.getElementById("installments").value = 0;
+  }
+}
+
+// Kayıt ekleme
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("transactionForm");
+  if (form) {
+    loadAccountsDropdown();
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const transaction = {
+        date: document.getElementById("dateInput").value,
+        type: document.getElementById("type").value,
+        category: document.getElementById("category").value,
+        note: document.getElementById("note").value,
+        amount: parseFloat(document.getElementById("amount").value),
+        accountId: document.getElementById("account").value,
+        installments: parseInt(document.getElementById("installments").value) || 0,
+        dueDate: document.getElementById("dueDate").value
+      };
+      transactions.push(transaction);
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+      alert("Kayıt eklendi!");
+      form.reset();
+    });
+  }
 });
 
-// =====================
-// KAYITLARI LİSTELEME
-// =====================
+// CSV aktarımı
+function importCSV() {
+  const fileInput = document.getElementById("csvFile");
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split("\n");
+    lines.forEach(line => {
+      const [date, type, category, note, amount, accountId, installments, dueDate] = line.split(",");
+      if (date && type) {
+        transactions.push({
+          date, type, category, note,
+          amount: parseFloat(amount),
+          accountId, installments: parseInt(installments) || 0,
+          dueDate
+        });
+      }
+    });
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    alert("CSV aktarımı tamamlandı!");
+  };
+  reader.readAsText(file);
+}
+
+// ===================== RECORDS.HTML =====================
 function displayRecords() {
-  const list=document.getElementById("recordsList");
-  if (!list) return;
-  list.innerHTML="";
-  transactions.forEach((t,index)=>{
-    const li=document.createElement("li");
-    li.innerHTML=`
-      ${t.date} - <span class="type-${t.type.toLowerCase()}">${t.type}</span> - ${t.amount} TL - ${t.category} (${t.accountId})
-      ${t.dueDate?`<span class="due-date">Son Ödeme: ${t.dueDate}</span>`:""}
-      <button onclick="editRecord(${index})">Düzenle</button>
-      <button onclick="deleteRecord(${index})">Sil</button>
+  const recordsList = document.getElementById("recordsList");
+  recordsList.innerHTML = "";
+
+  transactions.forEach((t, index) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${t.date}</td>
+      <td>${t.type}</td>
+      <td>${t.category}</td>
+      <td>${t.note}</td>
+      <td>${t.amount.toFixed(2)}</td>
+      <td>${t.accountId}</td>
+      <td>${t.installments}</td>
+      <td>${t.dueDate || ""}</td>
+      <td class="actions">
+        <button onclick="editRecord(${index})">Düzenle</button>
+        <button onclick="deleteRecord(${index})">Sil</button>
+      </td>
     `;
-    list.appendChild(li);
+    recordsList.appendChild(row);
   });
+}
+
+function editRecord(index) {
+  const t = transactions[index];
+  alert("Düzenleme için add.html sayfasına gidiniz. Açıklama: " + t.note);
+  // İleri seviye: add.html formunu doldurup açabiliriz
 }
 
 function deleteRecord(index) {
   if (confirm("Bu kaydı silmek istediğine emin misin?")) {
-    transactions.splice(index,1);
-    localStorage.setItem("transactions",JSON.stringify(transactions));
+    transactions.splice(index, 1);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
     displayRecords();
   }
 }
 
-let editingIndex=null;
-function editRecord(index) {
-  const t=transactions[index];
-  document.getElementById("type").value=t.type;
-  populateCategories();
-  document.getElementById("category").value=t.category;
-  document.getElementById("amount").value=t.amount;
-  document.getElementById("note").value=t.note;
-  document.getElementById("dateInput").value=t.date;
-  document.getElementById("account").value=t.accountId;
-  document.getElementById("dueDate").value=t.dueDate||"";
-  editingIndex=index;
-}
-
-// =====================
-// HESAP/KART LİSTELEME
-// =====================
-function displayAccounts() {
-  const list=document.getElementById("accountList");
-  if (!list) return;
-  list.innerHTML="";
-  accounts.forEach(acc=>{
-    const li=document.createElement("li");
-    li.innerHTML=`${acc.name} ${acc.dueDate?`<span class="due-date">(Son Ödeme: ${acc.dueDate})</span>`:""}`;
-    list.appendChild(li);
-  });
-}
-
-// =====================
-// RAPOR EKRANI
-// =====================
+// ===================== REPORT.HTML =====================
 function displayReport() {
-  const reportDiv=document.getElementById("report");
-  if (!reportDiv) return;
-  const month=document.getElementById("monthSelect")?.value;
+  const month = document.getElementById("monthSelect").value;
   if (!month) return;
 
-  let gelir=0,gider=0,transfer=0;
-  transactions.forEach(t=>{
-    if (t.date.startsWith(month)) {
-      if (t.type==="Gelir") gelir+=t.amount;
-      else if (t.type==="Gider") gider+=t.amount;
-      else if (t.type==="Transfer") transfer+=t.amount;
+  const [year, mon] = month.split("-");
+  const filtered = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getFullYear() == year && (d.getMonth() + 1) == mon;
+  });
+
+  // Gelir/Gider raporu
+  const incomeExpenseDiv = document.getElementById("incomeExpenseReport");
+  let incomeMap = {};
+  let expenseMap = {};
+  filtered.forEach(t => {
+    if (t.type === "Gelir") {
+      incomeMap[t.category] = (incomeMap[t.category] || 0) + t.amount;
+    } else if (t.type === "Gider") {
+      expenseMap[t.category] = (expenseMap[t.category] || 0) + t.amount;
     }
   });
 
-  reportDiv.innerHTML=`
-    <p>Gelir: ${gelir} TL</p>
-    <p>Gider: ${gider} TL</p>
-    <p>Transfer: ${transfer} TL</
+  let html = "<table><tr><th>Kategori</th><th>Toplam</th></tr>";
+  Object.entries(incomeMap).forEach(([cat, sum]) => {
+    html += `<tr><td>${cat} (Gelir)</td><td>${sum.toFixed(2)}</td></tr>`;
+  });
+  Object.entries(expenseMap).forEach(([cat, sum]) => {
+    html += `<tr><td>${cat} (Gider)</td><td>${sum.toFixed(2)}</td></tr>`;
+  });
+  html += "</table>";
+  incomeExpenseDiv.innerHTML = html;
+
+  // Kredi kartı borçları
+  const creditDiv = document.getElementById("creditCardReport");
+  let creditHtml = "<table><tr><th>Kart</th><th>Son Ödeme Tarihi</th><th>Bakiye</th></tr>";
+  accounts.filter(a => a.type === "Kredi Kartı").forEach(acc => {
+    const balance = filtered.filter(t => t.accountId === acc.name)
+      .reduce((sum, t) => sum + t.amount, 0);
+    creditHtml += `<tr><td>${acc.name}</td><td>${acc.dueDay || "-"}</td><td>${balance.toFixed(2)}</td></tr>`;
+  });
+  creditHtml += "</table>";
+  creditDiv.innerHTML = creditHtml;
+
+  // Anlık bakiyeler
+  const balanceDiv = document.getElementById("balancesReport");
+  let balanceHtml = "<table><tr><th>Hesap/Kart</th><th>Bakiye</th></tr>";
+  accounts.forEach(acc => {
+    const balance = transactions.filter(t => t.accountId === acc.name)
+      .reduce((sum, t) => sum + (t.type === "Gel
