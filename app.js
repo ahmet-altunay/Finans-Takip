@@ -2,7 +2,13 @@
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
 // Hesap/Kartlar
-let accounts = JSON.parse(localStorage.getItem("accounts")) || ["Cüzdan", "Ziraat Bankası", "İş Bankası", "Garanti Bonus", "Akbank Axess"];
+let accounts = JSON.parse(localStorage.getItem("accounts")) || [
+  { name: "Cüzdan" },
+  { name: "Ziraat Bankası" },
+  { name: "İş Bankası" },
+  { name: "Garanti Bonus", dueDate: "" },
+  { name: "Akbank Axess", dueDate: "" }
+];
 
 // Kategoriler
 let incomeCategories = JSON.parse(localStorage.getItem("incomeCategories")) || ["Maaş", "Ek Gelir", "Faiz Geliri"];
@@ -30,7 +36,7 @@ function showBalances() {
 
   let html = "";
   accounts.forEach(acc => {
-    html += `${acc}: 0 TL<br>`; // Şimdilik sabit, ileride hesap bazlı bakiye eklenebilir
+    html += `${acc.name}: 0 TL<br>`;
   });
 
   balancesDiv.innerHTML = html;
@@ -72,8 +78,8 @@ function populateCategories() {
     accountSelect.innerHTML = "";
     accounts.forEach(acc => {
       const option = document.createElement("option");
-      option.value = acc;
-      option.textContent = acc;
+      option.value = acc.name;
+      option.textContent = acc.name;
       accountSelect.appendChild(option);
     });
   }
@@ -133,8 +139,10 @@ document.getElementById("transactionForm")?.addEventListener("submit", function(
   const accountId = document.getElementById("account").value;
   const date = document.getElementById("dateInput").value;
   const installments = parseInt(document.getElementById("installments")?.value || 0);
+  const dueDate = document.getElementById("dueDate")?.value || "";
+  const receiptFile = document.getElementById("receiptFile")?.value || "";
 
-  const transaction = { type, amount, category, note, accountId, date, installments };
+  const transaction = { type, amount, category, note, accountId, date, installments, dueDate, receiptFile };
   transactions.push(transaction);
   localStorage.setItem("transactions", JSON.stringify(transactions));
 
@@ -152,7 +160,8 @@ function displayRecords() {
   transactions.forEach((t, index) => {
     const li = document.createElement("li");
     li.innerHTML = `
-      ${t.date} - ${t.type} - ${t.amount} TL - ${t.category} (${t.accountId})
+      ${t.date} - <span class="type-${t.type.toLowerCase()}">${t.type}</span> - ${t.amount} TL - ${t.category} (${t.accountId})
+      ${t.dueDate ? `<span class="due-date">Son Ödeme: ${t.dueDate}</span>` : ""}
       <button class="edit-btn" onclick="editRecord(${index})">Düzenle</button>
       <button class="delete-btn" onclick="deleteRecord(${index})">Sil</button>
     `;
@@ -179,7 +188,21 @@ function editRecord(index) {
   document.getElementById("note").value = t.note;
   document.getElementById("dateInput").value = t.date;
   document.getElementById("account").value = t.accountId;
+  document.getElementById("dueDate").value = t.dueDate || "";
   editingIndex = index;
+}
+
+// Hesap/Kartları listele
+function displayAccounts() {
+  const list = document.getElementById("accountList");
+  if (!list) return;
+
+  list.innerHTML = "";
+  accounts.forEach(acc => {
+    const li = document.createElement("li");
+    li.innerHTML = `${acc.name} ${acc.dueDate ? `<span class="due-date">(Son Ödeme: ${acc.dueDate})</span>` : ""}`;
+    list.appendChild(li);
+  });
 }
 
 // Rapor ekranı
@@ -198,32 +221,11 @@ function displayReport() {
   const incomeCats = {};
   const expenseCats = {};
   const transfers = [];
+  const dueDates = [];
 
   filtered.forEach(t => {
     if (t.type === "Gelir") {
       incomeTotal += t.amount;
       incomeCats[t.category] = (incomeCats[t.category] || 0) + t.amount;
-    } else if (t.type === "Gider") {
-      expenseTotal += t.amount;
-      expenseCats[t.category] = (expenseCats[t.category] || 0) + t.amount;
-    } else if (t.type === "Transfer") {
-      transfers.push(t);
-    }
-  });
-
-  const net = incomeTotal - expenseTotal;
-  const netColor = net >= 0 ? "green" : "red";
-
-  let html = `<h2>${selectedMonth} Raporu</h2>`;
-
-  html += `<h3>Gelir Kategorileri</h3>`;
-  for (const cat in incomeCats) html += `- ${cat}: ${incomeCats[cat]} TL<br>`;
-  html += `<strong>Toplam Gelir: ${incomeTotal} TL</strong><br><br>`;
-
-  html += `<h3>Gider Kategorileri</h3>`;
-  for (const cat in expenseCats) html += `- ${cat}: ${expenseCats[cat]} TL<br>`;
-  html += `<strong>Toplam Gider: ${expenseTotal} TL</strong><br><br>`;
-
-  html += `<h3 style="color:${netColor}">Net Durum: ${net} TL</h3><br>`;
-
-  if
+    } else if (t.type
+      

@@ -121,6 +121,27 @@ button:hover {
   flex-wrap: wrap;
 }
 
+/* Tür etiketleri */
+.type-income {
+  color: #4CAF50; /* yeşil */
+  font-weight: bold;
+}
+.type-expense {
+  color: #d9534f; /* kırmızı */
+  font-weight: bold;
+}
+.type-transfer {
+  color: #1e90ff; /* mavi */
+  font-weight: bold;
+}
+
+/* Son ödeme tarihi */
+.due-date {
+  color: orange;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
 /* Sil/Düzenle butonları */
 .edit-btn, .delete-btn {
   padding: 8px 12px;
@@ -182,14 +203,14 @@ th {
 /* 📱 Mobil uyum */
 @media (max-width: 600px) {
   body {
-    font-size: 18px;   /* yazılar büyütüldü */
+    font-size: 18px;
   }
   h1, h2, h3 {
-    font-size: 22px;   /* başlıklar büyütüldü */
+    font-size: 22px;
   }
   input, select, button {
-    padding: 14px;     /* dokunmatik için daha geniş */
-    font-size: 16px;   /* yazılar daha okunaklı */
+    padding: 14px;
+    font-size: 16px;
   }
   .menu button {
     font-size: 18px;

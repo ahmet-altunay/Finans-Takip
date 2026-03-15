@@ -2,32 +2,46 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Rapor</title>
+  <title>Raporlar</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
- <h1>Raporlar</h1>
+  <h1>Raporlar</h1>
 
- <label>1. Ay Seç:</label>
- <select id="monthSelect1"></select>
+  <!-- Tek Ay Raporu -->
+  <label>Ay Seç:</label>
+  <select id="monthSelect"></select>
+  <button onclick="displayReport()">Raporu Göster</button>
 
- <label>2. Ay Seç:</label>
- <select id="monthSelect2"></select>
+  <!-- İki Ay Karşılaştırma -->
+  <h2>Ay Karşılaştırma</h2>
+  <label>1. Ay Seç:</label>
+  <select id="monthSelect1"></select>
 
- <button onclick="compareReports()">Karşılaştır</button>
+  <label>2. Ay Seç:</label>
+  <select id="monthSelect2"></select>
 
- <div id="report"></div>
+  <button onclick="compareReports()">Karşılaştır</button>
 
- <nav class="menu">
-   <button onclick="location.href='index.html'">Ana Sayfa</button>
-   <button onclick="location.href='add.html'">Kayıt Ekle</button>
-   <button onclick="location.href='records.html'">Kayıtlar</button>
-   <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
- </nav>
+  <!-- Rapor Çıktısı -->
+  <div id="report"></div>
 
- <script src="app.js"></script>
- <script>
-   displayReport();
- </script>
+  <!-- Menü -->
+  <nav class="menu">
+    <button onclick="location.href='index.html'">Ana Sayfa</button>
+    <button onclick="location.href='add.html'">Kayıt Ekle</button>
+    <button onclick="location.href='records.html'">Kayıtlar</button>
+    <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
+  </nav>
+
+  <script src="app.js"></script>
+  <script>
+    // Sayfa açıldığında ay listelerini doldur
+    window.onload = function() {
+      populateMonthSelect("monthSelect");
+      populateMonthSelect("monthSelect1");
+      populateMonthSelect("monthSelect2");
+    };
+  </script>
 </body>
 </html>

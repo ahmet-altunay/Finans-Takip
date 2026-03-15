@@ -8,50 +8,19 @@
 <body>
   <h1>Kayıt Ekle</h1>
 
+  <!-- Manuel kayıt formu -->
   <form id="transactionForm">
-    <label>Tarih:</label>
-    <input type="date" id="dateInput" required>
-
-    <label for="type">Tür:</label>
-<select id="type" name="type">
-  <option value="Gelir">Gelir</option>
-  <option value="Gider">Gider</option>
-  <option value="Transfer">Transfer</option>
-</select>
-
-    <label>Kategori:</label>
-    <div style="display:flex; gap:8px; align-items:center;">
-      <select id="category"></select>
-      <button type="button" onclick="showCategoryInput()">+ Kategori Ekle</button>
-    </div>
-
-    <!-- Yeni kategori ekleme alanı gizli -->
-    <div id="newCategoryDiv" style="display:none; margin-top:10px;">
-      <input type="text" id="newCategory" placeholder="Yeni kategori adı">
-      <button type="button" onclick="addCategory()">Ekle</button>
-      <p id="categoryMessage" style="color:orange; display:none;"></p>
-    </div>
-
-    <label>Açıklama:</label>
-    <input type="text" id="note">
-
-    <label>Tutar:</label>
-    <input type="number" id="amount" required>
-
-    <label>Hesap/Kart:</label>
-    <select id="account"></select>
-
-    <div id="installmentSection" style="display:none;">
-      <label>Taksit Sayısı:</label>
-      <input type="number" id="installments" min="2" placeholder="Örn: 12">
-    </div>
-
-    <label>Fiş/Fatura (dosya):</label>
-    <input type="file" id="receiptFile">
+    <!-- ... senin mevcut alanların (Tarih, Tür, Kategori, Açıklama, Tutar, Hesap/Kart, Taksit, Son Ödeme Tarihi, Fiş/Fatura) ... -->
 
     <button type="submit">Kaydet</button>
   </form>
 
+  <!-- CSV Aktarım Alanı -->
+  <h2>Excel/CSV Aktar</h2>
+  <input type="file" id="csvFile" accept=".csv">
+  <button type="button" onclick="importCSV()">Aktar</button>
+
+  <!-- Menü -->
   <nav class="menu">
     <button onclick="location.href='index.html'">Ana Sayfa</button>
     <button onclick="location.href='records.html'">Kayıtlar</button>
