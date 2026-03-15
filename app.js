@@ -293,3 +293,34 @@ function importCSV() {
   };
   reader.readAsText(file, "UTF-8");
 }
+// Basit kayıt listesi
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+// Form submit yakalama
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("transactionForm");
+  if (!form) return;
+
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+
+    // Formdan değerleri al
+    const transaction = {
+      date: document.getElementById("dateInput").value,
+      type: document.getElementById("type").value,
+      category: document.getElementById("category").value,
+      note: document.getElementById("note").value,
+      amount: parseFloat(document.getElementById("amount").value),
+      accountId: document.getElementById("account").value,
+      installments: parseInt(document.getElementById("installments").value) || 0,
+      dueDate: document.getElementById("dueDate").value
+    };
+
+    // Listeye ekle ve kaydet
+    transactions.push(transaction);
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    alert("Kayıt başarıyla eklendi!");
+    form.reset();
+  });
+});
