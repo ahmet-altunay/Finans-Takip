@@ -22,9 +22,9 @@ function populateCategories() {
   categorySelect.innerHTML = "";
 
   let categories = [];
-  if (type === "Gelir") categories = ["Maaş", "Ek Gelir"];
-  else if (type === "Gider") categories = ["Market", "Fatura", "Ulaşım", "Eğlence"];
-  else if (type === "Transfer") categories = ["Hesaplar Arası"];
+  if (type.toLowerCase() === "gelir") categories = ["Maaş", "Ek Gelir"];
+  else if (type.toLowerCase() === "gider") categories = ["Market", "Fatura", "Ulaşım", "Eğlence"];
+  else if (type.toLowerCase() === "transfer") categories = ["Hesaplar Arası"];
 
   categories.forEach(cat => {
     const opt = document.createElement("option");
@@ -118,6 +118,7 @@ function importCSV() {
       const parts = line.split(";");
       if (parts.length < 8) return; // eksik satırları atla
 
+      // Türkçe sayı formatını düzelt
       let amountStr = parts[4].trim().replace(/\./g, "").replace(",", ".");
       let amount = parseFloat(amountStr);
 
@@ -207,11 +208,4 @@ function displayReport() {
     html += `<tr><td>${cat} (Gelir)</td><td>${sum.toFixed(2)}</td></tr>`;
   });
   Object.entries(expenseMap).forEach(([cat, sum]) => {
-    html += `<tr><td>${cat} (Gider)</td><td>${sum.toFixed(2)}</td></tr>`;
-  });
-  html += "</table>";
-  incomeExpenseDiv.innerHTML = html;
-
-  // Kredi kartı borçları
-  const creditDiv = document.getElementById("creditCardReport");
-  let creditHtml = "<table><tr><th>Kart</th><th>Son Ö
+    html += `<tr><td>${cat} (Gider)</td><td>${sum.toFixed
