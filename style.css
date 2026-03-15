@@ -187,23 +187,16 @@ th {
   color: orange;
 }
 
-/* Mobil uyum */
 @media (max-width: 600px) {
   body {
-    font-size: 18px;   /* yazılar biraz daha büyük */
+    font-size: 18px;   /* yazılar büyütüldü */
   }
   h1, h2, h3 {
     font-size: 22px;   /* başlıklar büyütüldü */
   }
-  form {
-    margin: 10px;
-  }
   input, select, button {
     padding: 14px;     /* dokunmatik için daha geniş */
     font-size: 16px;   /* yazılar daha okunaklı */
-  }
-  #report {
-    font-size: 16px;
   }
   .menu button {
     font-size: 18px;   /* menü butonları büyütüldü */
