@@ -16,8 +16,6 @@ function startClock() {
 }
 
 // ===================== ADD.HTML =====================
-
-// Kategori mantığı
 function populateCategories() {
   const type = document.getElementById("type").value;
   const categorySelect = document.getElementById("category");
@@ -54,7 +52,6 @@ function addCategory() {
   }
 }
 
-// Hesap/Kart dropdown
 function loadAccountsDropdown() {
   const accountSelect = document.getElementById("account");
   if (!accountSelect) return;
@@ -67,7 +64,6 @@ function loadAccountsDropdown() {
   });
 }
 
-// Taksit mantığı
 function toggleInstallments() {
   const account = document.getElementById("account").value;
   const section = document.getElementById("installmentSection");
@@ -79,7 +75,6 @@ function toggleInstallments() {
   }
 }
 
-// Kayıt ekleme
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("transactionForm");
   if (form) {
@@ -100,11 +95,12 @@ document.addEventListener("DOMContentLoaded", () => {
       localStorage.setItem("transactions", JSON.stringify(transactions));
       alert("Kayıt eklendi!");
       form.reset();
+      if (typeof displayRecords === "function") displayRecords();
     });
   }
 });
 
-// CSV aktarımı
+// ===================== CSV AKTARIMI =====================
 function importCSV() {
   const fileInput = document.getElementById("csvFile");
   const file = fileInput.files[0];
@@ -117,28 +113,29 @@ function importCSV() {
   reader.onload = e => {
     const lines = e.target.result.split("\n").map(line => line.trim()).filter(line => line.length > 0);
 
-    lines.forEach(line => {
-      const parts = line.split(",");
-      if (parts.length >= 8) {
-        const [date, type, category, note, amount, accountId, installments, dueDate] = parts;
-        transactions.push({
-          date: date.trim(),
-          type: type.trim(),
-          category: category.trim(),
-          note: note.trim(),
-          amount: parseFloat(amount) || 0,
-          accountId: accountId.trim(),
-          installments: parseInt(installments) || 0,
-          dueDate: dueDate ? dueDate.trim() : ""
-        });
-      }
+    lines.forEach((line, idx) => {
+      if (idx === 0 || line.startsWith("Tarih")) return; // başlığı atla
+      const parts = line.split(";");
+      if (parts.length < 8) return; // eksik satırları atla
+
+      let amountStr = parts[4].trim().replace(/\./g, "").replace(",", ".");
+      let amount = parseFloat(amountStr);
+
+      transactions.push({
+        date: parts[0].trim(),
+        type: parts[1].trim(),
+        category: parts[2].trim(),
+        note: parts[3].trim(),
+        amount: amount || 0,
+        accountId: parts[5].trim(),
+        installments: parseInt(parts[6]) || 0,
+        dueDate: parts[7] ? parts[7].trim() : ""
+      });
     });
 
     localStorage.setItem("transactions", JSON.stringify(transactions));
     alert("CSV aktarımı tamamlandı!");
-    if (typeof displayRecords === "function") {
-      displayRecords();
-    }
+    if (typeof displayRecords === "function") displayRecords();
   };
   reader.readAsText(file, "UTF-8");
 }
@@ -198,9 +195,9 @@ function displayReport() {
   let incomeMap = {};
   let expenseMap = {};
   filtered.forEach(t => {
-    if (t.type === "Gelir") {
+    if (t.type.toLowerCase() === "gelir") {
       incomeMap[t.category] = (incomeMap[t.category] || 0) + t.amount;
-    } else if (t.type === "Gider") {
+    } else if (t.type.toLowerCase() === "gider") {
       expenseMap[t.category] = (expenseMap[t.category] || 0) + t.amount;
     }
   });
@@ -217,6 +214,4 @@ function displayReport() {
 
   // Kredi kartı borçları
   const creditDiv = document.getElementById("creditCardReport");
-  let creditHtml = "<table><tr><th>Kart</th><th>Son Ödeme Günü</th><th>Bakiye</th></tr>";
-  accounts.filter(a => a.type === "Kredi Kartı").forEach(acc => {
-    const
+  let creditHtml = "<table><tr><th>Kart</th><th>Son Ö
