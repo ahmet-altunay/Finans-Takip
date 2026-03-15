@@ -209,3 +209,45 @@ function displayReport() {
   });
   Object.entries(expenseMap).forEach(([cat, sum]) => {
     html += `<tr><td>${cat} (Gider)</td><td>${sum.toFixed
+      function importCSV() {
+  const fileInput = document.getElementById("csvFile");
+  const file = fileInput.files[0];
+  if (!file) {
+    alert("Lütfen bir CSV dosyası seçin.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+
+    lines.forEach((line, idx) => {
+      if (idx === 0 || line.startsWith("Tarih")) return; // başlığı atla
+      const parts = line.split(";");
+      if (parts.length < 8) return; // eksik satırları atla
+
+      // Tarihi düzelt (2025.11.28 → 2025-11-28)
+      let dateStr = parts[0].trim().replace(/\./g, "-");
+
+      // Türkçe sayı formatını düzelt (4.500,00 → 4500.00)
+      let amountStr = parts[4].trim().replace(/\./g, "").replace(",", ".");
+      let amount = parseFloat(amountStr);
+
+      transactions.push({
+        date: dateStr,
+        type: parts[1].trim(),
+        category: parts[2].trim(),
+        note: parts[3].trim(),
+        amount: amount || 0,
+        accountId: parts[5].trim(),
+        installments: parseInt(parts[6]) || 0,
+        dueDate: parts[7] ? parts[7].trim() : ""
+      });
+    });
+
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    alert("CSV aktarımı tamamlandı!");
+    if (typeof displayRecords === "function") displayRecords();
+  };
+  reader.readAsText(file, "UTF-8");
+}
