@@ -1,10 +1,10 @@
-/* Genel gri tema */
+/* Genel tema */
 body {
   font-family: Arial, sans-serif;
   margin: 10px;
   padding: 0;
-  background-color: #2f2f2f; /* koyu gri arka plan */
-  color: #f0f0f0; /* açık gri yazılar */
+  background-color: #2f2f2f;
+  color: #f0f0f0;
 }
 
 h1, h2, h3 {
@@ -59,7 +59,7 @@ button:hover {
   background-color: #777;
 }
 
-/* Menü butonları */
+/* Menü */
 .menu {
   margin-top: 30px;
   display: flex;
@@ -70,7 +70,7 @@ button:hover {
 .menu button {
   padding: 15px;
   font-size: 18px;
-  background-color: #555; /* gri */
+  background-color: #555;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -79,12 +79,12 @@ button:hover {
 }
 
 .menu button:hover {
-  background-color: #777; /* daha açık gri */
+  background-color: #777;
 }
 
 /* Rapor kutusu */
 #report {
-  background-color: #3a3a3a; /* orta gri kutu */
+  background-color: #3a3a3a;
   padding: 15px;
   border-radius: 8px;
   margin: 20px;
@@ -103,14 +103,6 @@ button:hover {
   color: #fff;
 }
 
-#report h3[style*="color:green"] {
-  font-weight: bold;
-}
-
-#report h3[style*="color:red"] {
-  font-weight: bold;
-}
-
 /* Kayıt listesi */
 #recordsList {
   list-style: none;
@@ -126,10 +118,10 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap; /* mobilde satır kayması için */
+  flex-wrap: wrap;
 }
 
-/* Sil ve Düzenle butonları */
+/* Sil/Düzenle butonları */
 .edit-btn, .delete-btn {
   padding: 8px 12px;
   margin-left: 8px;
@@ -140,7 +132,7 @@ button:hover {
 }
 
 .edit-btn {
-  background-color: #4CAF50; /* yeşil */
+  background-color: #4CAF50;
   color: white;
 }
 
@@ -149,7 +141,7 @@ button:hover {
 }
 
 .delete-btn {
-  background-color: #d9534f; /* kırmızı */
+  background-color: #d9534f;
   color: white;
 }
 
@@ -157,12 +149,12 @@ button:hover {
   background-color: #c9302c;
 }
 
-/* Tablo (rapor karşılaştırma için) */
+/* Tablo */
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 15px;
-  display: block;          /* mobilde kaydırma için */
+  display: block;
   overflow-x: auto;
   white-space: nowrap;
 }
@@ -187,6 +179,7 @@ th {
   color: orange;
 }
 
+/* 📱 Mobil uyum */
 @media (max-width: 600px) {
   body {
     font-size: 18px;   /* yazılar büyütüldü */
@@ -199,11 +192,13 @@ th {
     font-size: 16px;   /* yazılar daha okunaklı */
   }
   .menu button {
-    font-size: 18px;   /* menü butonları büyütüldü */
+    font-size: 18px;
     padding: 16px;
   }
   #recordsList li {
-    font-size: 16px;   /* kayıt listesi yazıları büyütüldü */
+    font-size: 16px;
+  }
+  #report {
+    font-size: 16px;
   }
 }
-
