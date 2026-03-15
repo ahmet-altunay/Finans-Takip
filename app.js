@@ -8,8 +8,8 @@ function startClock() {
     const now = new Date();
     const dateStr = now.toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
     const timeStr = now.toLocaleTimeString("tr-TR");
-    document.getElementById("date").textContent = dateStr;
-    document.getElementById("clock").textContent = timeStr;
+    if (document.getElementById("date")) document.getElementById("date").textContent = dateStr;
+    if (document.getElementById("clock")) document.getElementById("clock").textContent = timeStr;
   }
   updateClock();
   setInterval(updateClock, 1000);
@@ -57,6 +57,7 @@ function addCategory() {
 // Hesap/Kart dropdown
 function loadAccountsDropdown() {
   const accountSelect = document.getElementById("account");
+  if (!accountSelect) return;
   accountSelect.innerHTML = "";
   accounts.forEach(acc => {
     const opt = document.createElement("option");
@@ -70,7 +71,7 @@ function loadAccountsDropdown() {
 function toggleInstallments() {
   const account = document.getElementById("account").value;
   const section = document.getElementById("installmentSection");
-  if (account.includes("ENPARA Kredi Kartı") || account.includes("Halkbank Kredi Kartı") || account.includes("Kredi Kartı")) {
+  if (account.includes("Kredi Kartı")) {
     section.style.display = "block";
   } else {
     section.style.display = "none";
@@ -107,31 +108,45 @@ document.addEventListener("DOMContentLoaded", () => {
 function importCSV() {
   const fileInput = document.getElementById("csvFile");
   const file = fileInput.files[0];
-  if (!file) return;
+  if (!file) {
+    alert("Lütfen bir CSV dosyası seçin.");
+    return;
+  }
 
   const reader = new FileReader();
   reader.onload = e => {
-    const lines = e.target.result.split("\n");
+    const lines = e.target.result.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+
     lines.forEach(line => {
-      const [date, type, category, note, amount, accountId, installments, dueDate] = line.split(",");
-      if (date && type) {
+      const parts = line.split(",");
+      if (parts.length >= 8) {
+        const [date, type, category, note, amount, accountId, installments, dueDate] = parts;
         transactions.push({
-          date, type, category, note,
-          amount: parseFloat(amount),
-          accountId, installments: parseInt(installments) || 0,
-          dueDate
+          date: date.trim(),
+          type: type.trim(),
+          category: category.trim(),
+          note: note.trim(),
+          amount: parseFloat(amount) || 0,
+          accountId: accountId.trim(),
+          installments: parseInt(installments) || 0,
+          dueDate: dueDate ? dueDate.trim() : ""
         });
       }
     });
+
     localStorage.setItem("transactions", JSON.stringify(transactions));
     alert("CSV aktarımı tamamlandı!");
+    if (typeof displayRecords === "function") {
+      displayRecords();
+    }
   };
-  reader.readAsText(file);
+  reader.readAsText(file, "UTF-8");
 }
 
 // ===================== RECORDS.HTML =====================
 function displayRecords() {
   const recordsList = document.getElementById("recordsList");
+  if (!recordsList) return;
   recordsList.innerHTML = "";
 
   transactions.forEach((t, index) => {
@@ -157,7 +172,6 @@ function displayRecords() {
 function editRecord(index) {
   const t = transactions[index];
   alert("Düzenleme için add.html sayfasına gidiniz. Açıklama: " + t.note);
-  // İleri seviye: add.html formunu doldurup açabiliriz
 }
 
 function deleteRecord(index) {
@@ -203,18 +217,6 @@ function displayReport() {
 
   // Kredi kartı borçları
   const creditDiv = document.getElementById("creditCardReport");
-  let creditHtml = "<table><tr><th>Kart</th><th>Son Ödeme Tarihi</th><th>Bakiye</th></tr>";
+  let creditHtml = "<table><tr><th>Kart</th><th>Son Ödeme Günü</th><th>Bakiye</th></tr>";
   accounts.filter(a => a.type === "Kredi Kartı").forEach(acc => {
-    const balance = filtered.filter(t => t.accountId === acc.name)
-      .reduce((sum, t) => sum + t.amount, 0);
-    creditHtml += `<tr><td>${acc.name}</td><td>${acc.dueDay || "-"}</td><td>${balance.toFixed(2)}</td></tr>`;
-  });
-  creditHtml += "</table>";
-  creditDiv.innerHTML = creditHtml;
-
-  // Anlık bakiyeler
-  const balanceDiv = document.getElementById("balancesReport");
-  let balanceHtml = "<table><tr><th>Hesap/Kart</th><th>Bakiye</th></tr>";
-  accounts.forEach(acc => {
-    const balance = transactions.filter(t => t.accountId === acc.name)
-      .reduce((sum, t) => sum + (t.type === "Gel
+    const
