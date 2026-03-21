@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Ana Sayfa</title>
+  <title>Finans Takip Sistemi</title>
   <link rel="stylesheet" href="style.css">
   <style>
     body {
@@ -20,6 +20,7 @@
       font-weight: bold;
       margin: 5px 0;
       color: #333;
+      text-align: center;
     }
     #balances {
       margin-top: 15px;
@@ -31,15 +32,23 @@
       flex-direction: column;
       margin-top: 20px;
     }
-    nav.menu button {
+    nav.menu a {
       margin: 5px 0;
       padding: 10px;
       font-size: 16px;
-      cursor: pointer;
+      text-align: center;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+    nav.menu a:hover {
+      background: #0056b3;
     }
   </style>
 </head>
-<body onload="startClock()">
+
+<body>
   <h1>Finans Takip Sistemi</h1>
 
   <!-- Canlı Tarih ve Saat -->
@@ -51,13 +60,36 @@
 
   <!-- Menü -->
   <nav class="menu">
-    <button onclick="location.href='add.html'">Kayıt Ekle</button>
-    <button onclick="location.href='records.html'">Kayıtlar</button>
-    <button onclick="location.href='report.html'">Raporlar</button>
-    <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
+    <a href="add.html">Kayıt Ekle</a>
+    <a href="records.html">Kayıtlar</a>
+    <a href="report.html">Raporlar</a>
+    <a href="accounts.html">Hesap/Kartlar</a>
   </nav>
 
   <!-- JavaScript -->
-  <script src="app.js"></script>
+  <script>
+    function startClock() {
+      function updateClock() {
+        const now = new Date();
+
+        const dateStr = now.toLocaleDateString("tr-TR", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric"
+        });
+
+        const timeStr = now.toLocaleTimeString("tr-TR");
+
+        document.getElementById("date").textContent = dateStr;
+        document.getElementById("clock").textContent = timeStr;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
+    }
+
+    document.addEventListener("DOMContentLoaded", startClock);
+  </script>
 </body>
 </html>

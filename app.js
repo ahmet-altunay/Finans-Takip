@@ -1,54 +1,71 @@
-document.getElementById("transactionForm").addEventListener("submit", function(event) {
-  event.preventDefault();
-  // Burada kayıt ekleme işlemlerini yapacaksın
-});
 // ===================== GENEL =====================
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-
-// Canlı saat ve tarih
+<<<<<<< HEAD
 function startClock() {
   function updateClock() {
     const now = new Date();
     const dateStr = now.toLocaleDateString("tr-TR");
     const timeStr = now.toLocaleTimeString("tr-TR");
-
     document.getElementById("date").textContent = "Tarih: " + dateStr;
     document.getElementById("clock").textContent = "Saat: " + timeStr;
+=======
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+
+// ===================== SAAT =====================
+function startClock() {
+  function updateClock() {
+    const now = new Date();
+    document.getElementById("date")?.textContent = "Tarih: " + now.toLocaleDateString("tr-TR");
+    document.getElementById("clock")?.textContent = "Saat: " + now.toLocaleTimeString("tr-TR");
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
   }
   updateClock();
   setInterval(updateClock, 1000);
 }
+
+<<<<<<< HEAD
 function displayBalances() {
   const balancesDiv = document.getElementById("balances");
   const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+=======
+// ===================== BAKİYELER =====================
+function displayBalances() {
+  const div = document.getElementById("balances");
+  if (!div) return;
 
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
   if (accounts.length === 0) {
-    balancesDiv.innerHTML = "<p>Henüz hesap eklenmedi.</p>";
+    div.innerHTML = "<p>Henüz hesap yok</p>";
     return;
   }
-
+<<<<<<< HEAD
   let html = "<h2>Hesap Bakiyeleri</h2><ul>";
+=======
+
+  let html = "<h3>Hesaplar</h3><ul>";
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
   accounts.forEach(acc => {
-    html += `<li>${acc.name} (${acc.type}) - Bakiye: ${acc.balance || 0}</li>`;
+    html += `<li>${acc.name} (${acc.type}) - ${acc.balance || 0}₺</li>`;
   });
   html += "</ul>";
-
+<<<<<<< HEAD
   balancesDiv.innerHTML = html;
-}
+=======
 
+  div.innerHTML = html;
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
+}
 
 // ===================== ADD.HTML =====================
 function populateCategories() {
+<<<<<<< HEAD
   const type = document.getElementById("type").value;
   const categorySelect = document.getElementById("category");
   categorySelect.innerHTML = "";
-
   let categories = [];
-  if (type === "Gelir") categories = ["Maaş Geliri", "Ders Ücreti Geliri", "Aile Destek Geliri", "Para Üstü Geliri", "Toki Depozit İadesi"];
-  else if (type === "Gider") categories = ["Akaryakıt Gideri", "Araç Devir Ücreti", "Araç Sigorta", "Araç Tamir Bakım", "Araç Vergi", "Arda Harici Gider", "Arda Nafaka Bedeli", "Araç Devir Ücreti", "Babam İçin Harcanan", "Banka-Faiz Gideri", "Ehliyet Yenileme", "Ev Gideri", "Haberleşme", "İlaç-Sağlık Gideri", "Kişisel Bakım", "Küçük Demirbaş Gideri", "Toki - Depozit", "Ulaşım Gideri", "Yatırım", "Yeme-içme Gideri", "Yurtdışı Harcama"];
-  else if (type === "Transfer") categories = ["Aile İçi Transfer", "Aday Ödemesi"];
-
+  if (type === "Gelir") categories = ["Maaş", "Ders Ücreti", "Aile Destek", "Para Üstü", "Depozit İadesi"];
+  else if (type === "Gider") categories = ["Akaryakıt", "Araç Sigorta", "Ev Gideri", "Yeme-İçme", "Sağlık", "Yatırım"];
+  else if (type === "Transfer") categories = ["Aile İçi Transfer", "Ödeme"];
   categories.forEach(cat => {
     const option = document.createElement("option");
     option.value = cat;
@@ -63,82 +80,14 @@ function showCategoryInput() {
 
 function addCategory() {
   const newCat = document.getElementById("newCategory").value.trim();
+  const categorySelect = document.getElementById("category");
+  const message = document.getElementById("categoryMessage");
   if (newCat) {
-    const categorySelect = document.getElementById("category");
     const opt = document.createElement("option");
     opt.value = newCat;
     opt.textContent = newCat;
     categorySelect.appendChild(opt);
     categorySelect.value = newCat;
-    document.getElementById("categoryMessage").textContent = "Kategori eklendi.";
-    document.getElementById("categoryMessage").style.display = "block";
-  }
-}
-
-function loadAccountsDropdown() {
-  const accountSelect = document.getElementById("account");
-  if (!accountSelect) return;
-  accountSelect.innerHTML = "";
-  accounts.forEach(acc => {
-    const opt = document.createElement("option");
-    opt.value = acc.name;
-    opt.textContent = acc.name;
-    accountSelect.appendChild(opt);
-  });
-}
-
-function toggleInstallments() {
-  const accountSelect = document.getElementById("account");
-  const installmentSection = document.getElementById("installmentSection");
-  const selectedAccount = accountSelect.value;
-
-  if (selectedAccount.includes("Kredi Kartı")) {
-    installmentSection.style.display = "block";
-  } else {
-    installmentSection.style.display = "none";
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("transactionForm");
-  if (form) {
-    loadAccountsDropdown();
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const transaction = {
-        date: document.getElementById("dateInput").value,
-        type: document.getElementById("type").value,
-        category: document.getElementById("category").value,
-        note: document.getElementById("note").value,
-        amount: parseFloat(document.getElementById("amount").value),
-        accountId: document.getElementById("account").value,
-        installments: parseInt(document.getElementById("installments").value) || 0,
-        dueDate: document.getElementById("dueDate").value
-      };
-      transactions.push(transaction);
-      localStorage.setItem("transactions", JSON.stringify(transactions));
-      alert("Kayıt eklendi!");
-      form.reset();
-      if (typeof displayRecords === "function") displayRecords();
-    });
-  }
-});
-function showCategoryInput() {
-  document.getElementById("newCategoryDiv").style.display = "block";
-}
-
-function addCategory() {
-  const newCategory = document.getElementById("newCategory").value.trim();
-  const categorySelect = document.getElementById("category");
-  const message = document.getElementById("categoryMessage");
-
-  if (newCategory) {
-    const option = document.createElement("option");
-    option.value = newCategory;
-    option.textContent = newCategory;
-    categorySelect.appendChild(option);
-    categorySelect.value = newCategory;
-
     message.textContent = "Kategori eklendi.";
     message.style.display = "block";
   } else {
@@ -147,58 +96,145 @@ function addCategory() {
   }
 }
 
+function loadAccountsDropdown() {
+  const accountSelect = document.getElementById("account");
+  if (!accountSelect) return;
+  accountSelect.innerHTML = "";
+  const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+=======
+  const type = document.getElementById("type")?.value;
+  const select = document.getElementById("category");
+  if (!select) return;
 
-// ===================== CSV AKTARIMI =====================
-function importCSV() {
-  const fileInput = document.getElementById("csvFile");
-  const file = fileInput.files[0];
-  if (!file) {
-    alert("Lütfen bir CSV dosyası seçin.");
-    return;
+  select.innerHTML = "";
+
+  let categories = [];
+  if (type === "Gelir") categories = ["Maaş", "Ek Gelir"];
+  else if (type === "Gider") categories = ["Yemek", "Ulaşım", "Fatura"];
+  else if (type === "Transfer") categories = ["Transfer"];
+
+  categories.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    select.appendChild(opt);
+  });
+}
+
+function loadAccountsDropdown() {
+  const select = document.getElementById("account");
+  if (!select) return;
+
+  select.innerHTML = "";
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
+  accounts.forEach(acc => {
+    const opt = document.createElement("option");
+    opt.value = acc.name;
+    opt.textContent = acc.name;
+    select.appendChild(opt);
+  });
+}
+
+<<<<<<< HEAD
+function toggleInstallments() {
+  const accountSelect = document.getElementById("account");
+  const installmentSection = document.getElementById("installmentSection");
+  const selectedAccount = accountSelect.value;
+  if (selectedAccount.includes("Kredi Kartı")) {
+    installmentSection.style.display = "block";
+  } else {
+    installmentSection.style.display = "none";
   }
+}
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split("\n").map(line => line.trim()).filter(line => line.length > 0);
-
-    lines.forEach((line, idx) => {
-      if (idx === 0 || line.startsWith("Tarih")) return; // başlığı atla
-      const parts = line.split(";");
-      if (parts.length < 8) return; // eksik satırları atla
-
-      // Türkçe sayı formatını düzelt
-      let amountStr = parts[4].trim().replace(/\./g, "").replace(",", ".");
-      let amount = parseFloat(amountStr);
-
-      transactions.push({
-        date: parts[0].trim(),
-        type: parts[1].trim(),
-        category: parts[2].trim(),
-        note: parts[3].trim(),
-        amount: amount || 0,
-        accountId: parts[5].trim(),
-        installments: parseInt(parts[6]) || 0,
-        dueDate: parts[7] ? parts[7].trim() : ""
-      });
-    });
-
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    alert("CSV aktarımı tamamlandı!");
-    if (typeof displayRecords === "function") displayRecords();
+function saveRecord(event) {
+  event.preventDefault();
+  const record = {
+    date: document.getElementById("dateInput").value,
+    type: document.getElementById("type").value,
+    category: document.getElementById("category").value,
+    note: document.getElementById("note").value,
+    amount: Number(document.getElementById("amount").value),
+    account: document.getElementById("account").value,
+    installments: Number(document.getElementById("installments").value),
+    dueDate: document.getElementById("dueDate").value
   };
-  reader.readAsText(file, "UTF-8");
+  let records = JSON.parse(localStorage.getItem("records")) || [];
+  records.push(record);
+  localStorage.setItem("records", JSON.stringify(records));
+  alert("Kayıt başarıyla eklendi!");
+  document.getElementById("transactionForm").reset();
 }
 
 // ===================== RECORDS.HTML =====================
 function displayRecords() {
   const recordsList = document.getElementById("recordsList");
   recordsList.innerHTML = "";
-
   const records = JSON.parse(localStorage.getItem("records")) || [];
+=======
+// ===================== FORM SUBMIT =====================
+document.addEventListener("DOMContentLoaded", () => {
+  startClock();
+  displayBalances();
+  loadAccountsDropdown();
+  displayAccounts?.();
+  displayRecords?.();
 
-  records.forEach((rec, index) => {
+  // TRANSACTION FORM
+  const form = document.getElementById("transactionForm");
+  if (form) {
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const t = {
+        date: document.getElementById("dateInput").value,
+        type: document.getElementById("type").value,
+        category: document.getElementById("category").value,
+        note: document.getElementById("note").value,
+        amount: parseFloat(document.getElementById("amount").value),
+        accountId: document.getElementById("account").value
+      };
+
+      transactions.push(t);
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+
+      alert("Kayıt eklendi");
+      form.reset();
+    });
+  }
+
+  // ACCOUNT FORM
+  const accountForm = document.getElementById("accountForm");
+  if (accountForm) {
+    accountForm.addEventListener("submit", e => {
+      e.preventDefault();
+
+      const name = document.getElementById("accountName").value.trim();
+      const type = document.getElementById("accountType").value;
+
+      if (!name) return alert("İsim boş olamaz");
+
+      accounts.push({ name, type });
+      localStorage.setItem("accounts", JSON.stringify(accounts));
+
+      accountForm.reset();
+      displayAccounts();
+    });
+  }
+});
+
+// ===================== RECORDS =====================
+function displayRecords() {
+  const table = document.getElementById("recordsList");
+  if (!table) return;
+
+  table.innerHTML = "";
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
+
+  transactions.forEach((t, i) => {
     const row = document.createElement("tr");
     row.innerHTML = `
+<<<<<<< HEAD
       <td>${rec.date}</td>
       <td>${rec.type}</td>
       <td>${rec.category}</td>
@@ -207,24 +243,24 @@ function displayRecords() {
       <td>${rec.account}</td>
       <td>${rec.installments || "-"}</td>
       <td>${rec.dueDate || "-"}</td>
-      <td class="actions">
-        <button onclick="editRecord(${index})">Düzenle</button>
-        <button onclick="deleteRecord(${index})">Sil</button>
+      <td><button onclick="deleteRecord(${index})">Sil</button></td>
+=======
+      <td>${t.date}</td>
+      <td>${t.type}</td>
+      <td>${t.category}</td>
+      <td>${t.note}</td>
+      <td>${t.amount}</td>
+      <td>${t.accountId}</td>
+      <td>
+        <button onclick="deleteRecord(${i})">Sil</button>
       </td>
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
     `;
-    recordsList.appendChild(row);
+    table.appendChild(row);
   });
 }
 
-function editRecord(index) {
-  let records = JSON.parse(localStorage.getItem("records")) || [];
-  const rec = records[index];
-
-  // Düzenleme için add.html sayfasına yönlendirme
-  // index parametresi ile hangi kaydın düzenleneceğini belirtiyoruz
-  location.href = "add.html?edit=" + index;
-}
-
+<<<<<<< HEAD
 function deleteRecord(index) {
   let records = JSON.parse(localStorage.getItem("records")) || [];
   records.splice(index, 1);
@@ -232,18 +268,7 @@ function deleteRecord(index) {
   displayRecords();
 }
 
-
 // ===================== REPORT.HTML =====================
-function displayReport() {
-  const month = document.getElementById("monthSelect").value;
-  if (!month) return;
-
-  const [year, mon] = month.split("-");
-  const filtered = transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getFullYear() == year && (d.getMonth() + 1) == mon;
-  });
-
 function displayReport() {
   const month = document.getElementById("monthSelect").value;
   const records = JSON.parse(localStorage.getItem("records")) || [];
@@ -254,16 +279,15 @@ function displayReport() {
   // Gelir/Gider raporu
   let income = 0, expense = 0;
   filtered.forEach(rec => {
-    if (rec.type === "Gelir") income += Number(rec.amount);
-    else if (rec.type === "Gider") expense += Number(rec.amount);
+    if (rec.type === "Gelir") income += rec.amount;
+    else if (rec.type === "Gider") expense += rec.amount;
   });
   document.getElementById("incomeExpenseReport").innerHTML =
     `<p>Gelir: ${income} | Gider: ${expense} | Net: ${income - expense}</p>`;
 
   // Kredi Kartı Borçları
-  const creditCards = filtered.filter(rec => rec.account.includes("Kredi Kartı"));
   let ccHtml = "<table><tr><th>Kart</th><th>Tutar</th><th>Son Ödeme</th></tr>";
-  creditCards.forEach(rec => {
+  filtered.filter(rec => rec.account.includes("Kredi Kartı")).forEach(rec => {
     ccHtml += `<tr><td>${rec.account}</td><td>${rec.amount}</td><td>${rec.dueDate || "-"}</td></tr>`;
   });
   ccHtml += "</table>";
@@ -279,67 +303,7 @@ function displayReport() {
   document.getElementById("balancesReport").innerHTML = balHtml;
 }
 
-
-  // Gelir/Gider raporu
-  const incomeExpenseDiv = document.getElementById("incomeExpenseReport");
-  let incomeMap = {};
-  let expenseMap = {};
-  filtered.forEach(t => {
-    if (t.type.toLowerCase() === "gelir") {
-      incomeMap[t.category] = (incomeMap[t.category] || 0) + t.amount;
-    } else if (t.type.toLowerCase() === "gider") {
-      expenseMap[t.category] = (expenseMap[t.category] || 0) + t.amount;
-    }
-  });
-
-  let html = "<table><tr><th>Kategori</th><th>Toplam</th></tr>";
-  Object.entries(incomeMap).forEach(([cat, sum]) => {
-    html += `<tr><td>${cat} (Gelir)</td><td>${sum.toFixed(2)}</td></tr>`;
-  });
-  Object.entries(expenseMap).forEach(([cat, sum]) => {
-    html += `<tr><td>${cat} (Gider)</td><td>${sum.toFixed
-      function importCSV() {
-  const fileInput = document.getElementById("csvFile");
-  const file = fileInput.files[0];
-  if (!file) {
-    alert("Lütfen bir CSV dosyası seçin.");
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    const lines = e.target.result.split("\n").map(line => line.trim()).filter(line => line.length > 0);
-
-    lines.forEach((line, idx) => {
-      if (idx === 0 || line.startsWith("Tarih")) return; // başlığı atla
-      const parts = line.split(";");
-      if (parts.length < 8) return; // eksik satırları atla
-
-      // Tarihi düzelt (2025.11.28 → 2025-11-28)
-      let dateStr = parts[0].trim().replace(/\./g, "-");
-
-      // Türkçe sayı formatını düzelt (4.500,00 → 4500.00)
-      let amountStr = parts[4].trim().replace(/\./g, "").replace(",", ".");
-      let amount = parseFloat(amountStr);
-
-      transactions.push({
-        date: dateStr,
-        type: parts[1].trim(),
-        category: parts[2].trim(),
-        note: parts[3].trim(),
-        amount: amount || 0,
-        accountId: parts[5].trim(),
-        installments: parseInt(parts[6]) || 0,
-        dueDate: parts[7] ? parts[7].trim() : ""
-      });
-    });
-
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    alert("CSV aktarımı tamamlandı!");
-    if (typeof displayRecords === "function") displayRecords();
-  };
-  reader.readAsText(file, "UTF-8");
-}
+// ===================== CSV AKTARIMI =====================
 function importCSV() {
   const fileInput = document.getElementById("csvFile");
   const file = fileInput.files[0];
@@ -351,108 +315,37 @@ function importCSV() {
   const reader = new FileReader();
   reader.onload = e => {
     const lines = e.target.result.split("\n").map(line => line.trim()).filter(line => line.length > 0);
+    let records = JSON.parse(localStorage.getItem("records")) || [];
 
     lines.forEach((line, idx) => {
-      if (idx === 0 || line.startsWith("Tarih")) return; // başlığı atla
+      if (idx === 0 || line.startsWith("Tarih")) return;
       const parts = line.split(";");
-      if (parts.length < 8) return; // eksik satırları atla
+      if (parts.length < 8) return;
 
-      // Tarihi düzelt (2025.11.28 → 2025-11-28)
-      let dateStr = parts[0].trim().replace(/\./g, "-");
-
-      // Türkçe sayı formatını düzelt (4.500,00 → 4500.00)
       let amountStr = parts[4].trim().replace(/\./g, "").replace(",", ".");
       let amount = parseFloat(amountStr);
 
-      transactions.push({
-        date: dateStr,
-        type: parts[1].trim().toLowerCase(), // GELİR/GİDER/TRANSFER normalize
+      records.push({
+        date: parts[0].trim(),
+        type: parts[1].trim(),
         category: parts[2].trim(),
         note: parts[3].trim(),
         amount: amount || 0,
-        accountId: parts[5].trim(),
+        account: parts[5].trim(),
         installments: parseInt(parts[6]) || 0,
         dueDate: parts[7] ? parts[7].trim() : ""
       });
     });
 
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-    alert("CSV aktarımı tamamlandı!");
+    localStorage.setItem("records", JSON.stringify(records));
+    alert("CSV aktarımı tamamlandı! " + records.length + " kayıt var.");
     if (typeof displayRecords === "function") displayRecords();
   };
+
   reader.readAsText(file, "UTF-8");
 }
-// Basit kayıt listesi
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
-// Form submit yakalama
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("transactionForm");
-  if (!form) return;
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-
-    // Formdan değerleri al
-    const transaction = {
-      date: document.getElementById("dateInput").value,
-      type: document.getElementById("type").value,
-      category: document.getElementById("category").value,
-      note: document.getElementById("note").value,
-      amount: parseFloat(document.getElementById("amount").value),
-      accountId: document.getElementById("account").value,
-      installments: parseInt(document.getElementById("installments").value) || 0,
-      dueDate: document.getElementById("dueDate").value
-    };
-
-    // Listeye ekle ve kaydet
-    transactions.push(transaction);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-
-    alert("Kayıt başarıyla eklendi!");
-    form.reset();
-  });
-});
-// app.js
-
-const accountForm = document.getElementById("accountForm");
-
-// Form gönderiminde çalışacak
-accountForm.addEventListener("submit", function(event) {
-  event.preventDefault();
-
-  const name = document.getElementById("accountName").value.trim();
-  const type = document.getElementById("accountType").value;
-  const dueDayInput = document.getElementById("dueDay").value.trim();
-  const dueDay = type === "Kredi Kartı" && dueDayInput !== "" ? parseInt(dueDayInput) : null;
-
-  if (!name) {
-    alert("Hesap/Kart adı boş olamaz!");
-    return;
-  }
-
-  const editingIndex = accountForm.getAttribute("data-editing-index");
-
-  let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-
-  if (editingIndex !== null) {
-    // Düzenleme modunda
-    accounts[editingIndex] = { name, type, dueDay };
-    accountForm.removeAttribute("data-editing-index");
-  } else {
-    // Yeni ekleme
-    accounts.push({ name, type, dueDay });
-  }
-
-  localStorage.setItem("accounts", JSON.stringify(accounts));
-
-  accountForm.reset();
-  document.getElementById("dueDateSection").style.display = "none";
-
-  displayAccounts();
-});
-
-// Kredi kartı seçildiğinde son ödeme günü alanını aç/kapat
+// ===================== ACCOUNTS.HTML =====================
 function toggleDueDate() {
   const type = document.getElementById("accountType").value;
   const dueDateSection = document.getElementById("dueDateSection");
@@ -463,50 +356,135 @@ function toggleDueDate() {
   }
 }
 
-// Hesapları tabloya yazdır
 function displayAccounts() {
   const accountsList = document.getElementById("accountsList");
   accountsList.innerHTML = "";
-
   const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
 
   accounts.forEach((acc, index) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${acc.name}</td>
-      <td>${acc.type}</td>
-      <td>${acc.type === "Kredi Kartı" ? (acc.dueDay || "-") : "-"}</td>
-      <td>
-        <button onclick="editAccount(${index})">Düzenle</button>
-        <button onclick="deleteAccount(${index})">Sil</button>
-      </td>
-    `;
-    accountsList.appendChild(row);
-  });
-}
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td>${acc.name}</td>
+    <td>${acc.type}</td>
+    <td>${acc.type === "Kredi Kartı" ? (acc.dueDay || "-") : "-"}</td>
+    <td>
+      <button onclick="editAccount(${index})">Düzenle</button>
+      <button onclick="deleteAccount(${index})">Sil</button>
+    </td>
+  ;`
+  accountsList.appendChild(row);
+});
 
-// Hesap silme
+
 function deleteAccount(index) {
   let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
   accounts.splice(index, 1);
+=======
+function deleteRecord(i) {
+  transactions.splice(i, 1);
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+  displayRecords();
+}
+
+// ===================== ACCOUNTS =====================
+function displayAccounts() {
+  const table = document.getElementById("accountsList");
+  if (!table) return;
+
+  table.innerHTML = "";
+
+  accounts.forEach((a, i) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${a.name}</td>
+      <td>${a.type}</td>
+      <td>
+        <button onclick="deleteAccount(${i})">Sil</button>
+      </td>
+    `;
+    table.appendChild(row);
+  });
+}
+
+function deleteAccount(i) {
+  accounts.splice(i, 1);
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
   localStorage.setItem("accounts", JSON.stringify(accounts));
   displayAccounts();
 }
 
-// Hesap düzenleme
+<<<<<<< HEAD
 function editAccount(index) {
   let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
   const acc = accounts[index];
+=======
+// ===================== CSV =====================
+function importCSV() {
+  const input = document.getElementById("csvFile");
+  if (!input || !input.files[0]) return alert("Dosya seç");
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
 
-  document.getElementById("accountName").value = acc.name;
-  document.getElementById("accountType").value = acc.type;
-  toggleDueDate();
+  const reader = new FileReader();
+  reader.onload = e => {
+    const lines = e.target.result.split("\n");
 
-  if (acc.type === "Kredi Kartı" && acc.dueDay) {
-    document.getElementById("dueDay").value = acc.dueDay;
-  } else {
-    document.getElementById("dueDay").value = "";
-  }
+    lines.forEach((line, i) => {
+      if (i === 0) return;
 
-  accountForm.setAttribute("data-editing-index", index);
+<<<<<<< HEAD
+  document.getElementById("accountForm").setAttribute("data-editing-index", index);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const accountForm = document.getElementById("accountForm");
+  if (accountForm) {
+    accountForm.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("accountName").value.trim();
+      const type = document.getElementById("accountType").value;
+      const dueDayInput = document.getElementById("dueDay").value.trim();
+      const dueDay = type === "Kredi Kartı" && dueDayInput !== "" ? parseInt(dueDayInput) : null;
+
+      if (!name) {
+        alert("Hesap/Kart adı boş olamaz!");
+        return;
+      }
+
+      let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+      const editingIndex = accountForm.getAttribute("data-editing-index");
+
+      if (editingIndex !== null) {
+        accounts[editingIndex] = { name, type, dueDay };
+        accountForm.removeAttribute("data-editing-index");
+      } else {
+        accounts.push({ name, type, dueDay });
+      }
+
+      localStorage.setItem("accounts", JSON.stringify(accounts)); accountForm.reset();
+      document.getElementById("dueDateSection").style.display = "none";
+      displayAccounts();
+    });
+  }
+});
+=======
+      const p = line.split(";");
+      if (p.length < 5) return;
+
+      transactions.push({
+        date: p[0],
+        type: p[1],
+        category: p[2],
+        note: p[3],
+        amount: parseFloat(p[4].replace(",", ".")),
+        accountId: p[5]
+      });
+    });
+
+    localStorage.setItem("transactions", JSON.stringify(transactions));
+    alert("CSV yüklendi");
+  };
+
+  reader.readAsText(input.files[0]);
+}
+>>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628

@@ -1,4 +1,4 @@
-/* Genel Ayarlar */
+/* GENEL */
 body {
   font-family: Arial, sans-serif;
   max-width: 900px;
@@ -19,7 +19,7 @@ h2 {
   padding-bottom: 5px;
 }
 
-/* Formlar */
+/* FORM */
 form {
   display: flex;
   flex-direction: column;
@@ -32,44 +32,62 @@ label {
   font-weight: bold;
 }
 
-input, select, button {
+input, select {
   margin-top: 5px;
   padding: 8px;
   font-size: 14px;
 }
 
+/* BUTTON GENEL */
 button {
+  margin-top: 10px;
+  padding: 8px;
+  font-size: 14px;
   cursor: pointer;
-  background-color: #4CAF50;
-  color: white;
   border: none;
   border-radius: 4px;
+  background-color: #4CAF50;
+  color: white;
+  transition: 0.2s;
 }
 
 button:hover {
   background-color: #45a049;
 }
 
-/* Menü */
+/* SİL BUTONU */
+button.delete {
+  background-color: #f44336;
+}
+
+button.delete:hover {
+  background-color: #d32f2f;
+}
+
+/* MENÜ */
 nav.menu {
   display: flex;
   flex-direction: column;
   margin-top: 20px;
 }
 
-nav.menu button {
+nav.menu a {
   margin: 5px 0;
   padding: 10px;
   font-size: 16px;
   background-color: #2196F3;
+  color: white;
+  text-align: center;
+  text-decoration: none;
   border-radius: 4px;
+  transition: 0.2s;
 }
 
-nav.menu button:hover {
+nav.menu a:hover {
   background-color: #1976D2;
 }
 
-/* Tablo */
+/* TABLO */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -86,34 +104,44 @@ th {
   background-color: #f2f2f2;
 }
 
-/* Tarih ve Saat */
+/* TARİH SAAT */
 #date, #clock {
   font-size: 18px;
   font-weight: bold;
   margin: 5px 0;
-  color: #333;
 }
 
-/* Bakiyeler */
+/* BAKİYELER */
 #balances, #balancesReport {
   margin-top: 15px;
   font-size: 16px;
-  color: #444;
 }
 
-/* Kredi Kartı Son Ödeme Alanı */
-#dueDateSection {
-  display: none;
-  margin-top: 10px;
-}
-
-/* Taksit Bölümü */
-#installmentSection {
-  display: none;
-  margin-top: 10px;
-}
-
-/* Yeni Kategori Alanı */
+/* ÖZEL ALANLAR */
+#dueDateSection,
+#installmentSection,
 #newCategoryDiv {
   margin-top: 10px;
+}
+
+/* BOŞ MESAJ */
+#emptyMessage {
+  text-align: center;
+  margin-top: 15px;
+  color: gray;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  button, input, select {
+    font-size: 12px;
+  }
 }

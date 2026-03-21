@@ -4,29 +4,67 @@
   <meta charset="UTF-8">
   <title>Kayıtlar</title>
   <link rel="stylesheet" href="style.css">
+
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
+
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: center;
     }
+
     th {
       background-color: #f2f2f2;
     }
+
     .actions button {
       margin: 2px;
       padding: 5px 10px;
       font-size: 12px;
       cursor: pointer;
     }
+
+    nav.menu {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav.menu a {
+      margin: 5px 0;
+      padding: 10px;
+      text-align: center;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    nav.menu a:hover {
+      background: #0056b3;
+    }
+
+    #emptyMessage {
+      margin-top: 20px;
+      text-align: center;
+      color: gray;
+    }
   </style>
 </head>
-<body onload="displayRecords()">
+
+<body>
   <h1>Kayıtlar</h1>
 
   <table>
@@ -38,23 +76,57 @@
         <th>Açıklama</th>
         <th>Tutar</th>
         <th>Hesap/Kart</th>
-        <th>Taksit Sayısı</th>
-        <th>Son Ödeme Tarihi</th>
+        <th>Taksit</th>
+        <th>Son Ödeme</th>
         <th>İşlemler</th>
       </tr>
     </thead>
-    <tbody id="recordsList">
-      <!-- Kayıtlar app.js tarafından buraya eklenecek -->
-    </tbody>
+
+    <tbody id="recordsList"></tbody>
   </table>
 
+  <div id="emptyMessage"></div>
+
   <nav class="menu">
-    <button onclick="location.href='index.html'">Ana Sayfa</button>
-    <button onclick="location.href='add.html'">Kayıt Ekle</button>
-    <button onclick="location.href='report.html'">Raporlar</button>
-    <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
+    <a href="index.html">Ana Sayfa</a>
+    <a href="add.html">Kayıt Ekle</a>
+    <a href="report.html">Raporlar</a>
+    <a href="accounts.html">Hesap/Kartlar</a>
   </nav>
 
   <script src="app.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const records = JSON.parse(localStorage.getItem("transactions")) || [];
+      const table = document.getElementById("recordsList");
+      const emptyMsg = document.getElementById("emptyMessage");
+
+      if (records.length === 0) {
+        emptyMsg.textContent = "Henüz kayıt yok.";
+        return;
+      }
+
+      records.forEach((rec, i) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${rec.date || "-"}</td>
+          <td>${rec.type || "-"}</td>
+          <td>${rec.category || "-"}</td>
+          <td>${rec.note || "-"}</td>
+          <td>${rec.amount || 0}</td>
+          <td>${rec.accountId || "-"}</td>
+          <td>${rec.installments || "-"}</td>
+          <td>${rec.dueDate || "-"}</td>
+          <td class="actions">
+            <button onclick="deleteRecord(${i})">Sil</button>
+          </td>
+        `;
+
+        table.appendChild(row);
+      });
+    });
+  </script>
 </body>
 </html>

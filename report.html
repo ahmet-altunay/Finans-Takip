@@ -4,61 +4,159 @@
   <meta charset="UTF-8">
   <title>Raporlar</title>
   <link rel="stylesheet" href="style.css">
+
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
     section {
       margin-top: 20px;
     }
+
     h2 {
       margin-bottom: 10px;
       border-bottom: 1px solid #ccc;
       padding-bottom: 5px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
     }
+
     th, td {
       border: 1px solid #ccc;
       padding: 6px;
       text-align: center;
     }
+
     th {
       background-color: #f2f2f2;
     }
+
+    nav.menu {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav.menu a {
+      margin: 5px 0;
+      padding: 10px;
+      text-align: center;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    nav.menu a:hover {
+      background: #0056b3;
+    }
+
+    #emptyMessage {
+      margin-top: 15px;
+      color: gray;
+    }
   </style>
 </head>
+
 <body>
   <h1>Raporlar</h1>
 
-  <label for="monthSelect">Ay Seç:</label>
-  <input type="month" id="monthSelect" onchange="displayReport()">
+  <label>Ay Seç:</label>
+  <input type="month" id="monthSelect">
 
-  <!-- Gelir/Gider Raporu -->
+  <div id="emptyMessage"></div>
+
+  <!-- Gelir/Gider -->
   <section>
     <h2>Gelir ve Giderler</h2>
     <div id="incomeExpenseReport"></div>
   </section>
 
-  <!-- Kredi Kartı Borçları -->
+  <!-- Kredi Kartı -->
   <section>
     <h2>Kredi Kartı Borçları</h2>
     <div id="creditCardReport"></div>
   </section>
 
-  <!-- Anlık Bakiyeler -->
+  <!-- Bakiye -->
   <section>
     <h2>Anlık Bakiyeler</h2>
     <div id="balancesReport"></div>
   </section>
 
   <nav class="menu">
-    <button onclick="location.href='index.html'">Ana Sayfa</button>
-    <button onclick="location.href='add.html'">Kayıt Ekle</button>
-    <button onclick="location.href='records.html'">Kayıtlar</button>
-    <button onclick="location.href='accounts.html'">Hesap/Kartlar</button>
+    <a href="index.html">Ana Sayfa</a>
+    <a href="add.html">Kayıt Ekle</a>
+    <a href="records.html">Kayıtlar</a>
+    <a href="accounts.html">Hesap/Kartlar</a>
   </nav>
 
-  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const monthInput = document.getElementById("monthSelect");
+      const emptyMsg = document.getElementById("emptyMessage");
+
+      monthInput.addEventListener("change", generateReport);
+
+      function generateReport() {
+        const value = monthInput.value;
+        if (!value) return;
+
+        const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+        const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+
+        if (transactions.length === 0) {
+          emptyMsg.textContent = "Hiç kayıt bulunamadı.";
+          return;
+        }
+
+        emptyMsg.textContent = "";
+
+        // AY FİLTRE
+        const filtered = transactions.filter(t => t.date && t.date.startsWith(value));
+
+        // GELİR / GİDER
+        let income = 0, expense = 0;
+
+        filtered.forEach(t => {
+          if (t.type === "Gelir") income += t.amount;
+          if (t.type === "Gider") expense += t.amount;
+        });
+
+        document.getElementById("incomeExpenseReport").innerHTML =
+          `<p>Gelir: ${income}₺ | Gider: ${expense}₺ | Net: ${income - expense}₺</p>`;
+
+        // KREDİ KARTI
+        const credit = filtered.filter(t => t.accountId && t.accountId.includes("Kredi"));
+
+        let ccHtml = "<table><tr><th>Kart</th><th>Tutar</th><th>Tarih</th></tr>";
+
+        credit.forEach(t => {
+          ccHtml += `<tr><td>${t.accountId}</td><td>${t.amount}</td><td>${t.dueDate || "-"}</td></tr>`;
+        });
+
+        ccHtml += "</table>";
+        document.getElementById("creditCardReport").innerHTML = ccHtml;
+
+        // BAKİYE
+        let balHtml = "<table><tr><th>Hesap</th><th>Bakiye</th></tr>";
+
+        accounts.forEach(a => {
+          balHtml += `<tr><td>${a.name}</td><td>${a.balance || 0}</td></tr>`;
+        });
+
+        balHtml += "</table>";
+        document.getElementById("balancesReport").innerHTML = balHtml;
+      }
+    });
+  </script>
 </body>
 </html>

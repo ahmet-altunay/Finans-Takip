@@ -4,65 +4,106 @@
   <meta charset="UTF-8">
   <title>Hesap/Kartlar</title>
   <link rel="stylesheet" href="style.css">
+
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
     form {
       display: flex;
       flex-direction: column;
       max-width: 400px;
     }
+
     label {
       margin-top: 10px;
       font-weight: bold;
     }
+
     input, select, button {
       margin-top: 5px;
-      padding: 6px;
+      padding: 8px;
       font-size: 14px;
     }
+
     #dueDateSection {
       display: none;
       margin-top: 10px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
+
     th, td {
       border: 1px solid #ccc;
-      padding: 6px;
+      padding: 8px;
       text-align: center;
     }
+
     th {
       background-color: #f2f2f2;
     }
+
+    nav.menu {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    nav.menu a {
+      margin: 5px 0;
+      padding: 10px;
+      text-align: center;
+      background: #007bff;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+    }
+
+    nav.menu a:hover {
+      background: #0056b3;
+    }
+
+    #successMessage {
+      color: green;
+      margin-top: 10px;
+      display: none;
+    }
   </style>
 </head>
-<body onload="displayAccounts()">
+
+<body>
   <h1>Hesap/Kartlar</h1>
 
-  <!-- Yeni Hesap/Kart Ekle -->
+  <!-- FORM -->
   <form id="accountForm">
-    <label for="accountName">Hesap/Kart Adı:</label>
+    <label>Hesap/Kart Adı:</label>
     <input type="text" id="accountName" required>
 
-    <label for="accountType">Tür:</label>
-    <select id="accountType" onchange="toggleDueDate()">
+    <label>Tür:</label>
+    <select id="accountType">
       <option value="Banka Hesabı">Banka Hesabı</option>
       <option value="Nakit">Nakit</option>
       <option value="Kredi Kartı">Kredi Kartı</option>
     </select>
 
-    <!-- Kredi Kartı için Son Ödeme Günü -->
     <div id="dueDateSection">
-      <label for="dueDay">Son Ödeme Günü:</label>
-      <input type="number" id="dueDay" min="1" max="31" placeholder="örn: 10">
+      <label>Son Ödeme Günü:</label>
+      <input type="number" id="dueDay" min="1" max="31">
     </div>
 
     <button type="submit">Kaydet</button>
+    <div id="successMessage">Kaydedildi ✅</div>
   </form>
 
-  <!-- Mevcut Hesap/Kartlar -->
+  <!-- TABLO -->
   <h2>Mevcut Hesap/Kartlar</h2>
   <table>
     <thead>
@@ -70,21 +111,45 @@
         <th>Adı</th>
         <th>Tür</th>
         <th>Son Ödeme Günü</th>
-        <th>İşlemler</th> <!-- 🔹 Bunu ekle -->
+        <th>İşlemler</th>
       </tr>
     </thead>
-    <tbody id="accountsList">
-      <!-- Hesaplar app.js tarafından buraya eklenecek -->
-    </tbody>
+    <tbody id="accountsList"></tbody>
   </table>
 
+  <!-- MENÜ -->
   <nav class="menu">
-    <button onclick="location.href='index.html'">Ana Sayfa</button>
-    <button onclick="location.href='add.html'">Kayıt Ekle</button>
-    <button onclick="location.href='records.html'">Kayıtlar</button>
-    <button onclick="location.href='report.html'">Raporlar</button>
+    <a href="index.html">Ana Sayfa</a>
+    <a href="add.html">Kayıt Ekle</a>
+    <a href="records.html">Kayıtlar</a>
+    <a href="report.html">Raporlar</a>
   </nav>
 
+  <!-- SCRIPT -->
   <script src="app.js"></script>
+
+  <script>
+    // kredi kartı seçimine göre alan aç/kapat
+    document.addEventListener("DOMContentLoaded", () => {
+      const typeSelect = document.getElementById("accountType");
+      const dueSection = document.getElementById("dueDateSection");
+
+      typeSelect.addEventListener("change", () => {
+        if (typeSelect.value === "Kredi Kartı") {
+          dueSection.style.display = "block";
+        } else {
+          dueSection.style.display = "none";
+        }
+      });
+
+      // başarı mesajı
+      const form = document.getElementById("accountForm");
+      form.addEventListener("submit", () => {
+        const msg = document.getElementById("successMessage");
+        msg.style.display = "block";
+        setTimeout(() => msg.style.display = "none", 2000);
+      });
+    });
+  </script>
 </body>
 </html>
