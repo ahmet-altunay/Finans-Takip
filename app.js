@@ -57,115 +57,145 @@ function displayBalances() {
 }
 
 // ===================== ADD.HTML =====================
+// Sayfa yüklendiğinde çalışacak başlangıç ayarları
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.getElementById("type")) populateCategories();
+    if (document.getElementById("account")) loadAccountsDropdown();
+    
+    // Form gönderme olayını dinle
+    const form = document.getElementById("transactionForm");
+    if (form) {
+        form.addEventListener("submit", saveRecord);
+    }
+});
+
+// Tür seçimine göre kategorileri doldurur
 function populateCategories() {
-<<<<<<< HEAD
-  const type = document.getElementById("type").value;
-  const categorySelect = document.getElementById("category");
-  categorySelect.innerHTML = "";
-  let categories = [];
-  if (type === "Gelir") categories = ["Maaş", "Ders Ücreti", "Aile Destek", "Para Üstü", "Depozit İadesi"];
-  else if (type === "Gider") categories = ["Akaryakıt", "Araç Sigorta", "Ev Gideri", "Yeme-İçme", "Sağlık", "Yatırım"];
-  else if (type === "Transfer") categories = ["Aile İçi Transfer", "Ödeme"];
-  categories.forEach(cat => {
-    const option = document.createElement("option");
-    option.value = cat;
-    option.textContent = cat;
-    categorySelect.appendChild(option);
-  });
+    const type = document.getElementById("type").value;
+    const categorySelect = document.getElementById("category");
+    if (!categorySelect) return;
+
+    categorySelect.innerHTML = "";
+    let categories = [];
+
+    if (type === "Gelir") {
+        categories = ["Maaş", "Ders Ücreti", "Aile Destek", "Para Üstü", "Depozit İadesi"];
+    } else if (type === "Gider") {
+        categories = ["Akaryakıt", "Araç Sigorta", "Ev Gideri", "Yeme-İçme", "Sağlık", "Yatırım"];
+    } else if (type === "Transfer") {
+        categories = ["Aile İçi Transfer", "Ödeme"];
+    }
+
+    categories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        categorySelect.appendChild(option);
+    });
 }
 
-function showCategoryInput() {
-  document.getElementById("newCategoryDiv").style.display = "block";
-}
-
+// Yeni kategori ekleme fonksiyonu
 function addCategory() {
-  const newCat = document.getElementById("newCategory").value.trim();
-  const categorySelect = document.getElementById("category");
-  const message = document.getElementById("categoryMessage");
-  if (newCat) {
-    const opt = document.createElement("option");
-    opt.value = newCat;
-    opt.textContent = newCat;
-    categorySelect.appendChild(opt);
-    categorySelect.value = newCat;
-    message.textContent = "Kategori eklendi.";
-    message.style.display = "block";
-  } else {
-    message.textContent = "Kategori adı boş olamaz!";
-    message.style.display = "block";
-  }
+    const newCat = document.getElementById("newCategory").value.trim();
+    const categorySelect = document.getElementById("category");
+    const message = document.getElementById("categoryMessage");
+
+    if (newCat) {
+        const opt = document.createElement("option");
+        opt.value = newCat;
+        opt.textContent = newCat;
+        categorySelect.appendChild(opt);
+        categorySelect.value = newCat; // Yeni ekleneni seçili yap
+        
+        message.textContent = "Kategori eklendi.";
+        message.style.color = "green";
+        message.style.display = "block";
+        document.getElementById("newCategory").value = ""; // Kutuyu temizle
+    } else {
+        message.textContent = "Kategori adı boş olamaz!";
+        message.style.color = "red";
+        message.style.display = "block";
+    }
 }
 
+// Hesapları LocalStorage'dan yükle
 function loadAccountsDropdown() {
-  const accountSelect = document.getElementById("account");
-  if (!accountSelect) return;
-  accountSelect.innerHTML = "";
-  const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-=======
-  const type = document.getElementById("type")?.value;
-  const select = document.getElementById("category");
-  if (!select) return;
+    const accountSelect = document.getElementById("account");
+    if (!accountSelect) return;
 
-  select.innerHTML = "";
+    accountSelect.innerHTML = "";
+    const accounts = JSON.parse(localStorage.getItem("accounts")) || [
+        { name: "Nakit" },
+        { name: "Kredi Kartı" }
+    ];
 
-  let categories = [];
-  if (type === "Gelir") categories = ["Maaş", "Ek Gelir"];
-  else if (type === "Gider") categories = ["Yemek", "Ulaşım", "Fatura"];
-  else if (type === "Transfer") categories = ["Transfer"];
-
-  categories.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    select.appendChild(opt);
-  });
+    accounts.forEach(acc => {
+        const opt = document.createElement("option");
+        opt.value = acc.name;
+        opt.textContent = acc.name;
+        accountSelect.appendChild(opt);
+    });
 }
 
-function loadAccountsDropdown() {
-  const select = document.getElementById("account");
-  if (!select) return;
-
-  select.innerHTML = "";
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
-  accounts.forEach(acc => {
-    const opt = document.createElement("option");
-    opt.value = acc.name;
-    opt.textContent = acc.name;
-    select.appendChild(opt);
-  });
-}
-
-<<<<<<< HEAD
-function toggleInstallments() {
-  const accountSelect = document.getElementById("account");
-  const installmentSection = document.getElementById("installmentSection");
-  const selectedAccount = accountSelect.value;
-  if (selectedAccount.includes("Kredi Kartı")) {
-    installmentSection.style.display = "block";
-  } else {
-    installmentSection.style.display = "none";
-  }
-}
-
+// Kaydı kaydetme fonksiyonu
 function saveRecord(event) {
-  event.preventDefault();
-  const record = {
-    date: document.getElementById("dateInput").value,
-    type: document.getElementById("type").value,
-    category: document.getElementById("category").value,
-    note: document.getElementById("note").value,
-    amount: Number(document.getElementById("amount").value),
-    account: document.getElementById("account").value,
-    installments: Number(document.getElementById("installments").value),
-    dueDate: document.getElementById("dueDate").value
-  };
-  let records = JSON.parse(localStorage.getItem("records")) || [];
-  records.push(record);
-  localStorage.setItem("records", JSON.stringify(records));
-  alert("Kayıt başarıyla eklendi!");
-  document.getElementById("transactionForm").reset();
+    event.preventDefault();
+    const record = {
+        date: document.getElementById("dateInput").value,
+        type: document.getElementById("type").value,
+        category: document.getElementById("category").value,
+        note: document.getElementById("note").value,
+        amount: Number(document.getElementById("amount").value),
+        account: document.getElementById("account").value,
+        installments: Number(document.getElementById("installments").value || 0),
+        dueDate: document.getElementById("dueDate").value
+    };
+
+    let records = JSON.parse(localStorage.getItem("records")) || [];
+    records.push(record);
+    localStorage.setItem("records", JSON.stringify(records));
+    
+    alert("Kayıt başarıyla eklendi!");
+    document.getElementById("transactionForm").reset();
+    populateCategories(); // Form sıfırlandığı için kategorileri tazele
 }
 
+// CSV Aktarma Fonksiyonu (Eksik olan kısım)
+function importCSV() {
+    const fileInput = document.getElementById("csvFile");
+    if (fileInput.files.length === 0) {
+        alert("Lütfen bir CSV dosyası seçin!");
+        return;
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const content = e.target.result;
+        const lines = content.split("\n");
+        let records = JSON.parse(localStorage.getItem("records")) || [];
+
+        // İlk satırı (başlık) atlamak için i=1'den başlatabilirsiniz
+        for (let i = 1; i < lines.length; i++) {
+            const data = lines[i].split(",");
+            if (data.length >= 5) {
+                records.push({
+                    date: data[0],
+                    type: data[1],
+                    category: data[2],
+                    note: data[3],
+                    amount: Number(data[4]),
+                    account: data[5] || "Bilinmiyor"
+                });
+            }
+        }
+        localStorage.setItem("records", JSON.stringify(records));
+        alert("CSV verileri başarıyla aktarıldı!");
+    };
+
+    reader.readAsText(file);
+}
 // ===================== RECORDS.HTML =====================
 function displayRecords() {
   const recordsList = document.getElementById("recordsList");
