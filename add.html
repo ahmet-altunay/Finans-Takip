@@ -3,79 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Kayıt Ekle</title>
-  <link rel="stylesheet" href="style.css">
-
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-      max-width: 400px;
-    }
-
-    label {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    input, select, button {
-      margin-top: 5px;
-      padding: 8px;
-      font-size: 14px;
-    }
-
-    #installmentSection {
-      display: none;
-      margin-top: 10px;
-    }
-
-    #newCategoryDiv {
-      display: none;
-      margin-top: 10px;
-    }
-
-    nav.menu {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    nav.menu a {
-      margin: 5px 0;
-      padding: 10px;
-      text-align: center;
-<<<<<<< HEAD
-      background: #2196F3;
-      color: white;
-      text-decoration: none;
-      border-radius: 4px;
-    }
-
-    nav.menu a:hover {
-      background: #1976D2;
-=======
-      background: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-
-    nav.menu a:hover {
-      background: #0056b3;
-    }
-
-    #successMessage {
-      color: green;
-      margin-top: 10px;
-      display: none;
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
-    }
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
+    form { display: flex; flex-direction: column; max-width: 400px; }
+    label { margin-top: 10px; font-weight: bold; }
+    input, select, button { margin-top: 5px; padding: 8px; font-size: 14px; }
+    #installmentSection, #newCategoryDiv, #successMessage { display: none; margin-top: 10px; }
+    nav.menu { margin-top: 20px; display: flex; flex-direction: column; }
+    nav.menu a { margin: 5px 0; padding: 10px; text-align: center; background: #2196F3; color: white; text-decoration: none; border-radius: 4px; }
+    nav.menu a:hover { background: #1976D2; }
+    #successMessage { color: green; font-weight: bold; }
   </style>
 </head>
 
@@ -98,11 +35,7 @@
     <button type="button" id="addCategoryBtn">+ Kategori Ekle</button>
 
     <div id="newCategoryDiv">
-<<<<<<< HEAD
       <input type="text" id="newCategory" placeholder="Yeni kategori adı">
-=======
-      <input type="text" id="newCategory" placeholder="Yeni kategori">
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
       <button type="button" id="saveCategoryBtn">Ekle</button>
       <p id="categoryMessage" style="color:orange; display:none;"></p>
     </div>
@@ -114,7 +47,10 @@
     <input type="number" id="amount" required>
 
     <label>Hesap/Kart:</label>
-    <select id="account"></select>
+    <select id="account">
+        <option value="Nakit">Nakit</option>
+        <option value="Kredi Kartı">Kredi Kartı</option>
+    </select>
 
     <div id="installmentSection">
       <label>Taksit Sayısı:</label>
@@ -128,18 +64,10 @@
     <div id="successMessage">Kayıt eklendi ✅</div>
   </form>
 
-<<<<<<< HEAD
   <h2>CSV Aktarımı</h2>
   <input type="file" id="csvFile" accept=".csv">
   <button type="button" id="csvBtn">CSV Aktar</button>
-=======
-  <!-- CSV -->
-  <h2>CSV Aktar</h2>
-  <input type="file" id="csvFile" accept=".csv">
-  <button type="button" id="csvBtn">Aktar</button>
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
 
-  <!-- MENÜ -->
   <nav class="menu">
     <a href="index.html">Ana Sayfa</a>
     <a href="records.html">Kayıtlar</a>
@@ -147,72 +75,59 @@
     <a href="accounts.html">Hesap/Kartlar</a>
   </nav>
 
+  <!-- app.js dosyanızın varlığından emin olun -->
   <script src="app.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // Sayfa yüklenince kategorileri getir
+      if (typeof populateCategories === "function") populateCategories();
 
-<<<<<<< HEAD
-      // kategori başlat
-      populateCategories();
-
-      // tür değişince kategori güncelle
-      document.getElementById("type").addEventListener("change", populateCategories);
-
-      // kategori ekleme alanı aç
-=======
-      // kategori doldur
-      populateCategories();
-
-      document.getElementById("type").addEventListener("change", populateCategories);
-
-      // kategori ekleme
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
+      // Kategori ekleme panelini aç
       document.getElementById("addCategoryBtn").addEventListener("click", () => {
         document.getElementById("newCategoryDiv").style.display = "block";
       });
 
-<<<<<<< HEAD
-      // kategori ekle
-=======
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
-      document.getElementById("saveCategoryBtn").addEventListener("click", addCategory);
+      // Tür değişince kategorileri güncelle
+      document.getElementById("type").addEventListener("change", () => {
+        if (typeof populateCategories === "function") populateCategories();
+      });
 
-      // taksit kontrolü
-      document.getElementById("account").addEventListener("change", () => {
-<<<<<<< HEAD
-        const val = document.getElementById("account").value.toLowerCase();
-        const sec = document.getElementById("installmentSection");
-
-        if (val.includes("kredi")) {
-          sec.style.display = "block";
-        } else {
-          sec.style.display = "none";
-=======
-        const selected = document.getElementById("account").value;
+      // Taksit alanını göster/gizle
+      document.getElementById("account").addEventListener("change", (e) => {
         const section = document.getElementById("installmentSection");
-
-        if (selected.toLowerCase().includes("kredi")) {
+        if (e.target.value.toLowerCase().includes("kredi")) {
           section.style.display = "block";
         } else {
           section.style.display = "none";
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
         }
       });
 
-      // csv
-      document.getElementById("csvBtn").addEventListener("click", importCSV);
-<<<<<<< HEAD
-=======
-
-      // başarı mesajı
-      document.getElementById("transactionForm").addEventListener("submit", () => {
+      // Form gönderildiğinde mesaj göster
+      document.getElementById("transactionForm").addEventListener("submit", (e) => {
+        // e.preventDefault(); // app.js içinde kayıt işlemi yapılıyorsa bunu aktif edin
         const msg = document.getElementById("successMessage");
         msg.style.display = "block";
-        setTimeout(() => msg.style.display = "none", 2000);
+        setTimeout(() => msg.style.display = "none", 3000);
       });
 
->>>>>>> 6ac4c93e5fa59e65a5cc6cca518b590a619ac628
+      // Kategori ekle butonuna basınca (app.js içindeki fonksiyonu çağırır)
+      document.getElementById("saveCategoryBtn").addEventListener("click", () => {
+        if (typeof addCategory === "function") {
+            addCategory();
+        } else {
+            alert("app.js içinde addCategory fonksiyonu bulunamadı!");
+        }
+      });
+
+      // CSV butonuna basınca
+      document.getElementById("csvBtn").addEventListener("click", () => {
+        if (typeof importCSV === "function") {
+            importCSV();
+        } else {
+            alert("app.js içinde importCSV fonksiyonu bulunamadı!");
+        }
+      });
     });
   </script>
 </body>
