@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yeni Kayıt Ekle</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #newCategoryDiv {
+      display: none;
+      margin-top: 10px;
+      padding: 15px;
+      background: #f0f0f0;
+      border-radius: 8px;
+    }
+    #csvBtn {
+      background: #28a745;
+      color: white;
+      padding: 15px;
+      font-size: 17px;
+      font-weight: bold;
+      margin: 20px 0;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #csvBtn:hover {
+      background: #218838;
+    }
+  </style>
 </head>
 <body>
   <h1>📌 Yeni Kayıt Ekle</h1>
@@ -24,7 +48,7 @@
     <select id="category"></select>
     <button type="button" id="addCategoryBtn">+ Yeni Kategori Ekle</button>
 
-    <div id="newCategoryDiv" style="display:none; margin-top:10px; padding:10px; background:#f0f0f0; border-radius:6px;">
+    <div id="newCategoryDiv">
       <input type="text" id="newCategory" placeholder="Yeni kategori adı" style="width:70%; display:inline-block;">
       <button type="button" id="saveCategoryBtn" style="width:28%;">Kaydet</button>
     </div>
@@ -38,11 +62,12 @@
     <label>Hesap / Kart:</label>
     <select id="account"></select>
 
-    <button type="submit" style="margin-top:20px; padding:12px;">✅ Kaydet</button>
+    <button type="submit" style="margin-top:20px; padding:12px; font-size:16px;">✅ Kaydet</button>
   </form>
 
-  <h2>📥 CSV'den Yükle (Tüm verilerini sisteme ekle)</h2>
-  <button id="csvBtn" style="background:#28a745; padding:12px; font-size:16px;">📊 CSV Dosyasını Sisteme Yükle (169 kayıt)</button>
+  <!-- CSV Yükleme Butonu -->
+  <h2>📥 Tüm Verileri CSV'den Yükle</h2>
+  <button id="csvBtn">📊 CSV Dosyasını Sisteme Yükle (169 kayıt)</button>
 
   <nav class="menu">
     <a href="index.html">Ana Sayfa</a>
