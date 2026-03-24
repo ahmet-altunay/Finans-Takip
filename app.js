@@ -362,4 +362,30 @@ function populateAccounts() {
     select.appendChild(opt);
   });
 }
+// GELİR RAPORU (kategoriler satır, aylar sütun)
+let gelirHTML = `<table><tr><th>Kategori</th>`;
+sortedMonths.forEach(m => {
+  gelirHTML += `<th>${m}</th>`;
+});
+gelirHTML += `<th style="background:#d4edda;">Toplam Gelir</th></tr>`;
+
+Array.from(gelirCategories).sort().forEach(cat => {
+  gelirHTML += `<tr><td class="month-cell">${cat}</td>`;
+  let catTotal = 0;
+  sortedMonths.forEach(month => {
+    const val = monthly[month].Gelir[cat] || 0;
+    gelirHTML += `<td>${val.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+    catTotal += val;
+  });
+  gelirHTML += `<td style="background:#d4edda; font-weight:bold">${catTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr>`;
+});
+
+// Genel toplam satırı
+gelirHTML += `<tr class="grand-total"><td><strong>TOPLAM</strong></td>`;
+sortedMonths.forEach(month => {
+  const monthTotal = Object.values(monthly[month].Gelir).reduce((a,b)=>a+b,0);
+  gelirHTML += `<td style="font-weight:bold">${monthTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+});
+gelirHTML += `<td style="font-weight:bold; background:#d4edda;">${Object.values(totalGelirByCat).reduce((a,b)=>a+b,0).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr></table>`;
+
 });
