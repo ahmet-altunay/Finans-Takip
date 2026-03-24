@@ -2,22 +2,61 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kayıt Ekle</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-    form { display: flex; flex-direction: column; max-width: 400px; }
-    label { margin-top: 10px; font-weight: bold; }
-    input, select, button { margin-top: 5px; padding: 8px; font-size: 14px; }
-    #installmentSection, #newCategoryDiv, #successMessage { display: none; margin-top: 10px; }
-    nav.menu { margin-top: 20px; display: flex; flex-direction: column; }
-    nav.menu a { margin: 5px 0; padding: 10px; text-align: center; background: #2196F3; color: white; text-decoration: none; border-radius: 4px; }
-    nav.menu a:hover { background: #1976D2; }
-    #successMessage { color: green; font-weight: bold; }
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f8f9fa;
+    }
+    h1 { text-align: center; color: #007bff; }
+    form { display: flex; flex-direction: column; }
+    label { margin-top: 12px; font-weight: bold; }
+    input, select, button {
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover { background: #0056b3; }
+    #installmentSection, #newCategoryDiv { display: none; margin-top: 10px; }
+    #successMessage {
+      color: #28a745;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 15px;
+      display: none;
+    }
+    nav.menu {
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    nav.menu a {
+      padding: 12px;
+      text-align: center;
+      background: #2196F3;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
   </style>
 </head>
-
 <body>
-  <h1>Kayıt Ekle</h1>
+  <h1>📌 Yeni Kayıt Ekle</h1>
 
   <form id="transactionForm">
     <label>Tarih:</label>
@@ -32,41 +71,41 @@
 
     <label>Kategori:</label>
     <select id="category"></select>
-    <button type="button" id="addCategoryBtn">+ Kategori Ekle</button>
+    <button type="button" id="addCategoryBtn">+ Yeni Kategori Ekle</button>
 
     <div id="newCategoryDiv">
       <input type="text" id="newCategory" placeholder="Yeni kategori adı">
-      <button type="button" id="saveCategoryBtn">Ekle</button>
-      <p id="categoryMessage" style="color:orange; display:none;"></p>
+      <button type="button" id="saveCategoryBtn">Kategoriyi Kaydet</button>
     </div>
 
     <label>Açıklama:</label>
-    <input type="text" id="note">
+    <input type="text" id="note" placeholder="Örn: Market alışverişi">
 
-    <label>Tutar:</label>
-    <input type="number" id="amount" required>
+    <label>Tutar (₺):</label>
+    <input type="number" id="amount" step="0.01" required>
 
-    <label>Hesap/Kart:</label>
+    <label>Hesap / Kart:</label>
     <select id="account">
-        <option value="Nakit">Nakit</option>
-        <option value="Kredi Kartı">Kredi Kartı</option>
+      <option value="Nakit">Nakit</option>
+      <option value="Kredi Kartı">Kredi Kartı</option>
+      <option value="Banka Hesabı">Banka Hesabı</option>
     </select>
 
     <div id="installmentSection">
       <label>Taksit Sayısı:</label>
-      <input type="number" id="installments" min="0" value="0">
+      <input type="number" id="installments" min="1" value="1">
     </div>
 
-    <label>Son Ödeme Tarihi:</label>
+    <label>Son Ödeme Tarihi (opsiyonel):</label>
     <input type="date" id="dueDate">
 
-    <button type="submit">Kaydet</button>
-    <div id="successMessage">Kayıt eklendi ✅</div>
+    <button type="submit">✅ Kaydet</button>
+    <div id="successMessage">Kayıt başarıyla eklendi ✅</div>
   </form>
 
-  <h2>CSV Aktarımı</h2>
+  <h2>📂 CSV Yükle (İçe Aktar)</h2>
   <input type="file" id="csvFile" accept=".csv">
-  <button type="button" id="csvBtn">CSV Aktar</button>
+  <button type="button" id="csvBtn">CSV'den Yükle</button>
 
   <nav class="menu">
     <a href="index.html">Ana Sayfa</a>
@@ -75,57 +114,57 @@
     <a href="accounts.html">Hesap/Kartlar</a>
   </nav>
 
-  <!-- app.js dosyanızın varlığından emin olun -->
   <script src="app.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Sayfa yüklenince kategorileri getir
-      if (typeof populateCategories === "function") populateCategories();
+      // app.js varsa kategorileri doldur
+      if (typeof populateCategories === "function") {
+        populateCategories();
+      }
 
-      // Kategori ekleme panelini aç
-      document.getElementById("addCategoryBtn").addEventListener("click", () => {
-        document.getElementById("newCategoryDiv").style.display = "block";
-      });
-
-      // Tür değişince kategorileri güncelle
+      // Tür değişince kategorileri yenile
       document.getElementById("type").addEventListener("change", () => {
         if (typeof populateCategories === "function") populateCategories();
       });
 
-      // Taksit alanını göster/gizle
+      // Kredi kartı seçilirse taksit alanını göster
       document.getElementById("account").addEventListener("change", (e) => {
-        const section = document.getElementById("installmentSection");
-        if (e.target.value.toLowerCase().includes("kredi")) {
-          section.style.display = "block";
-        } else {
-          section.style.display = "none";
-        }
+        document.getElementById("installmentSection").style.display = 
+          e.target.value.includes("Kredi") ? "block" : "none";
       });
 
-      // Form gönderildiğinde mesaj göster
-      document.getElementById("transactionForm").addEventListener("submit", (e) => {
-        // e.preventDefault(); // app.js içinde kayıt işlemi yapılıyorsa bunu aktif edin
-        const msg = document.getElementById("successMessage");
-        msg.style.display = "block";
-        setTimeout(() => msg.style.display = "none", 3000);
+      // Yeni kategori butonu
+      document.getElementById("addCategoryBtn").addEventListener("click", () => {
+        document.getElementById("newCategoryDiv").style.display = "block";
       });
 
-      // Kategori ekle butonuna basınca (app.js içindeki fonksiyonu çağırır)
+      // Kategori kaydet
       document.getElementById("saveCategoryBtn").addEventListener("click", () => {
         if (typeof addCategory === "function") {
-            addCategory();
+          addCategory();
         } else {
-            alert("app.js içinde addCategory fonksiyonu bulunamadı!");
+          alert("app.js dosyası eksik veya addCategory fonksiyonu bulunamadı!");
         }
       });
 
-      // CSV butonuna basınca
+      // Form gönderme
+      document.getElementById("transactionForm").addEventListener("submit", (e) => {
+        e.preventDefault();   // sayfayı yenilemeyi engeller
+
+        if (typeof addTransaction === "function") {
+          addTransaction();
+        } else {
+          alert("app.js içinde addTransaction fonksiyonu bulunamadı!");
+        }
+      });
+
+      // CSV yükleme
       document.getElementById("csvBtn").addEventListener("click", () => {
         if (typeof importCSV === "function") {
-            importCSV();
+          importCSV();
         } else {
-            alert("app.js içinde importCSV fonksiyonu bulunamadı!");
+          alert("app.js içinde importCSV fonksiyonu bulunamadı!");
         }
       });
     });
