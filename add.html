@@ -60,7 +60,9 @@
     <input type="number" id="amount" step="0.01" required>
 
     <label>Hesap / Kart:</label>
-    <select id="account"></select>
+    <select id="account">
+      <option value="">Hesap seçin...</option>
+    </select>
 
     <button type="submit" style="margin-top:25px; padding:14px; font-size:17px;">✅ Kaydet</button>
   </form>
@@ -78,22 +80,25 @@
 
   <script src="app.js"></script>
 
-  <!-- DÜZENLEME MODU SCRIPTİ -->
+  <!-- DÜZENLEME + HESAP DOLDURMA SCRIPTİ -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const editData = localStorage.getItem("editRecord");
+      // Hesapları dropdown'a doldur
+      populateAccounts();
 
+      // Düzenleme modu kontrolü
+      const editData = localStorage.getItem("editRecord");
+      
       if (editData) {
         const record = JSON.parse(editData);
 
-        // Formu doldur
         document.getElementById("dateInput").value = record.date || "";
         document.getElementById("type").value = record.type || "Gider";
         document.getElementById("note").value = record.note || "";
         document.getElementById("amount").value = record.amount || "";
         document.getElementById("account").value = record.account || "";
 
-        // Tür seçildikten sonra kategorileri yükle ve mevcut kategoriyi seç
+        // Tür ve kategori doldurma
         setTimeout(() => {
           populateCategories();
           setTimeout(() => {
@@ -101,17 +106,15 @@
           }, 100);
         }, 50);
 
-        // Başlığı değiştir
         document.querySelector("h1").innerHTML = "📝 Kaydı Düzenle";
 
-        // Form submit olayını düzenleme moduna çevir
+        // Formu düzenleme moduna al
         const form = document.getElementById("transactionForm");
         form.onsubmit = function(e) {
           e.preventDefault();
 
           let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
-          // Eşleşen kaydı bul
           const index = transactions.findIndex(t => 
             t.date === record.date && 
             parseFloat(t.amount) === parseFloat(record.amount) &&
@@ -133,8 +136,6 @@
 
             alert("✅ Kayıt başarıyla güncellendi!");
             window.location.href = "records.html";
-          } else {
-            alert("Kayıt bulunamadı!");
           }
         };
       }

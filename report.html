@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Raporlar</title>
+  <title>Raporlar - Tüm Dönem</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .report-section {
@@ -14,10 +14,10 @@
       margin-bottom: 25px;
     }
     .type-header {
-      font-size: 1.3em;
-      margin: 20px 0 10px 0;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #007bff;
+      font-size: 1.4em;
+      margin: 25px 0 12px 0;
+      padding-bottom: 10px;
+      border-bottom: 3px solid;
     }
     .gelir-header { color: #28a745; border-color: #28a745; }
     .gider-header { color: #dc3545; border-color: #dc3545; }
@@ -25,38 +25,39 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
+      margin: 10px 0 20px 0;
     }
     th, td {
-      padding: 10px;
+      padding: 12px;
       text-align: left;
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid #eee;
     }
     th {
       background: #f8f9fa;
       font-weight: bold;
     }
-    .summary {
-      font-size: 1.4em;
-      padding: 15px;
+    .total-row {
+      font-weight: bold;
       background: #f0f8ff;
-      border-radius: 8px;
-      margin: 15px 0;
+      font-size: 1.1em;
+    }
+    .summary-box {
+      background: #e7f3ff;
+      padding: 20px;
+      border-radius: 10px;
+      margin: 20px 0;
+      font-size: 1.3em;
     }
   </style>
 </head>
 <body>
-  <h1>📊 Raporlar ve Özetler</h1>
-
-  <label><strong>Ay Seç:</strong></label>
-  <input type="month" id="monthSelect" style="padding:8px; font-size:16px;">
-
-  <div id="emptyMessage" style="color: gray; margin: 20px 0; font-size: 18px;"></div>
+  <h1>📊 Tüm Dönem Raporu</h1>
+  <p style="text-align:center; color:#666;">Tüm kayıtlarınıza ait özet ve kategori dağılımları aşağıdadır.</p>
 
   <!-- Genel Özet -->
   <div class="report-section">
-    <h2>Gelir - Gider - Transfer Özeti</h2>
-    <div id="incomeExpenseReport" class="summary"></div>
+    <h2>Genel Finansal Özet</h2>
+    <div id="overallSummary" class="summary-box"></div>
   </div>
 
   <!-- Kategori Bazında Detaylı Dağılım -->
@@ -75,52 +76,39 @@
 
   <script src="app.js"></script>
   <script>
-    function generateReport() {
-      const monthInput = document.getElementById("monthSelect").value;
+    function generateAllReport() {
       const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-      const emptyMsg = document.getElementById("emptyMessage");
 
-      if (!monthInput) {
-        emptyMsg.textContent = "Lütfen bir ay seçin.";
-        return;
-      }
-
-      // Seçilen aya ait kayıtları filtrele
-      const filtered = transactions.filter(t => t.date && t.date.startsWith(monthInput));
-
-      if (filtered.length === 0) {
-        emptyMsg.textContent = "Bu ay için herhangi bir kayıt bulunamadı.";
-        document.getElementById("incomeExpenseReport").innerHTML = "";
+      if (transactions.length === 0) {
+        document.getElementById("overallSummary").innerHTML = "<p>Henüz hiç kayıt yok.</p>";
         document.getElementById("categoryReport").innerHTML = "";
         return;
       }
 
-      emptyMsg.textContent = "";
-
       // Genel Özet Hesapla
       let income = 0, expense = 0, transfer = 0;
-      filtered.forEach(t => {
+      transactions.forEach(t => {
         const amt = parseFloat(t.amount) || 0;
         if (t.type === "Gelir") income += amt;
         else if (t.type === "Gider") expense += amt;
         else if (t.type === "Transfer") transfer += amt;
       });
 
-      document.getElementById("incomeExpenseReport").innerHTML = `
-        <strong>Gelir:</strong> <span style="color:#28a745">${income.toLocaleString('tr-TR')} ₺</span><br>
-        <strong>Gider:</strong> <span style="color:#dc3545">${expense.toLocaleString('tr-TR')} ₺</span><br>
-        <strong>Transfer:</strong> <span style="color:#17a2b8">${transfer.toLocaleString('tr-TR')} ₺</span><br><br>
-        <strong style="font-size:1.2em;">Net Bakiye: ${(income - expense).toLocaleString('tr-TR')} ₺</strong>
+      const net = income - expense;
+
+      document.getElementById("overallSummary").innerHTML = `
+        <strong>Toplam Gelir:</strong> <span style="color:#28a745">${income.toLocaleString('tr-TR')} ₺</span><br>
+        <strong>Toplam Gider:</strong> <span style="color:#dc3545">${expense.toLocaleString('tr-TR')} ₺</span><br>
+        <strong>Toplam Transfer:</strong> <span style="color:#17a2b8">${transfer.toLocaleString('tr-TR')} ₺</span><br><br>
+        <strong style="font-size:1.4em; color:${net >= 0 ? '#28a745' : '#dc3545'}">
+          Net Bakiye: ${net.toLocaleString('tr-TR')} ₺
+        </strong>
       `;
 
-      // Kategori Bazında Dağılım (Türlere göre grupla)
-      const groups = {
-        Gelir: {},
-        Gider: {},
-        Transfer: {}
-      };
+      // Kategorileri Türlerine Göre Grupla
+      const groups = { Gelir: {}, Gider: {}, Transfer: {} };
 
-      filtered.forEach(t => {
+      transactions.forEach(t => {
         if (!t.category) return;
         const amt = parseFloat(t.amount) || 0;
         if (groups[t.type]) {
@@ -130,48 +118,50 @@
 
       let html = "";
 
-      // Gelir Grubu
+      // GELİR
       if (Object.keys(groups.Gelir).length > 0) {
         html += `<h3 class="type-header gelir-header">📈 GELİR KATEGORİLERİ</h3>`;
         html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
+        let totalIncome = 0;
         Object.keys(groups.Gelir).sort().forEach(cat => {
-          html += `<tr><td>${cat}</td><td style="color:#28a745; font-weight:bold">${groups.Gelir[cat].toLocaleString('tr-TR')} ₺</td></tr>`;
+          const amount = groups.Gelir[cat];
+          html += `<tr><td>${cat}</td><td style="color:#28a745; font-weight:bold">${amount.toLocaleString('tr-TR')} ₺</td></tr>`;
+          totalIncome += amount;
         });
-        html += `</table>`;
+        html += `<tr class="total-row"><td><strong>Toplam Gelir</strong></td><td style="color:#28a745">${totalIncome.toLocaleString('tr-TR')} ₺</td></tr></table>`;
       }
 
-      // Gider Grubu
+      // GİDER
       if (Object.keys(groups.Gider).length > 0) {
         html += `<h3 class="type-header gider-header">📉 GİDER KATEGORİLERİ</h3>`;
         html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
+        let totalExpense = 0;
         Object.keys(groups.Gider).sort().forEach(cat => {
-          html += `<tr><td>${cat}</td><td style="color:#dc3545; font-weight:bold">${groups.Gider[cat].toLocaleString('tr-TR')} ₺</td></tr>`;
+          const amount = groups.Gider[cat];
+          html += `<tr><td>${cat}</td><td style="color:#dc3545; font-weight:bold">${amount.toLocaleString('tr-TR')} ₺</td></tr>`;
+          totalExpense += amount;
         });
-        html += `</table>`;
+        html += `<tr class="total-row"><td><strong>Toplam Gider</strong></td><td style="color:#dc3545">${totalExpense.toLocaleString('tr-TR')} ₺</td></tr></table>`;
       }
 
-      // Transfer Grubu
+      // TRANSFER
       if (Object.keys(groups.Transfer).length > 0) {
         html += `<h3 class="type-header transfer-header">🔄 TRANSFER KATEGORİLERİ</h3>`;
         html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
+        let totalTransfer = 0;
         Object.keys(groups.Transfer).sort().forEach(cat => {
-          html += `<tr><td>${cat}</td><td style="color:#17a2b8; font-weight:bold">${groups.Transfer[cat].toLocaleString('tr-TR')} ₺</td></tr>`;
+          const amount = groups.Transfer[cat];
+          html += `<tr><td>${cat}</td><td style="color:#17a2b8; font-weight:bold">${amount.toLocaleString('tr-TR')} ₺</td></tr>`;
+          totalTransfer += amount;
         });
-        html += `</table>`;
+        html += `<tr class="total-row"><td><strong>Toplam Transfer</strong></td><td style="color:#17a2b8">${totalTransfer.toLocaleString('tr-TR')} ₺</td></tr></table>`;
       }
 
       document.getElementById("categoryReport").innerHTML = html;
     }
 
-    // Sayfa yüklendiğinde
-    document.addEventListener("DOMContentLoaded", () => {
-      const monthInput = document.getElementById("monthSelect");
-      const today = new Date().toISOString().slice(0, 7);
-      monthInput.value = today;
-
-      monthInput.addEventListener("change", generateReport);
-      generateReport();
-    });
+    // Sayfa yüklendiğinde raporu üret
+    document.addEventListener("DOMContentLoaded", generateAllReport);
   </script>
 </body>
 </html>
