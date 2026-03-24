@@ -61,7 +61,7 @@
 
     <label>Hesap / Kart:</label>
     <select id="account">
-      <option value="">Hesap seçin...</option>
+      <option value="">Hesap / Kart seçin...</option>
     </select>
 
     <button type="submit" style="margin-top:25px; padding:14px; font-size:17px;">✅ Kaydet</button>
@@ -80,15 +80,30 @@
 
   <script src="app.js"></script>
 
-  <!-- DÜZENLEME + HESAP DOLDURMA SCRIPTİ -->
   <script>
+    // Sayfa yüklendiğinde hesapları ve kategorileri doldur
     document.addEventListener("DOMContentLoaded", () => {
-      // Hesapları dropdown'a doldur
-      populateAccounts();
+      populateAccounts();   // Hesap / Kart dropdown'ını doldur
+      populateCategories(); // Kategorileri doldur (ilk yükleme)
+
+      // Tür değiştiğinde kategorileri yenile
+      document.getElementById("type").addEventListener("change", populateCategories);
+
+      // Yeni kategori butonu
+      document.getElementById("addCategoryBtn").addEventListener("click", () => {
+        document.getElementById("newCategoryDiv").style.display = "block";
+      });
+
+      document.getElementById("saveCategoryBtn").addEventListener("click", addNewCategory);
+
+      // Form submit
+      document.getElementById("transactionForm").addEventListener("submit", addTransaction);
+
+      // CSV butonu
+      document.getElementById("csvBtn").addEventListener("click", importCSV);
 
       // Düzenleme modu kontrolü
       const editData = localStorage.getItem("editRecord");
-      
       if (editData) {
         const record = JSON.parse(editData);
 
@@ -98,7 +113,6 @@
         document.getElementById("amount").value = record.amount || "";
         document.getElementById("account").value = record.account || "";
 
-        // Tür ve kategori doldurma
         setTimeout(() => {
           populateCategories();
           setTimeout(() => {
@@ -107,37 +121,6 @@
         }, 50);
 
         document.querySelector("h1").innerHTML = "📝 Kaydı Düzenle";
-
-        // Formu düzenleme moduna al
-        const form = document.getElementById("transactionForm");
-        form.onsubmit = function(e) {
-          e.preventDefault();
-
-          let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
-          const index = transactions.findIndex(t => 
-            t.date === record.date && 
-            parseFloat(t.amount) === parseFloat(record.amount) &&
-            t.category === record.category
-          );
-
-          if (index !== -1) {
-            transactions[index] = {
-              date: document.getElementById("dateInput").value,
-              type: document.getElementById("type").value,
-              category: document.getElementById("category").value,
-              note: document.getElementById("note").value,
-              amount: parseFloat(document.getElementById("amount").value),
-              account: document.getElementById("account").value || "Nakit"
-            };
-
-            localStorage.setItem("transactions", JSON.stringify(transactions));
-            localStorage.removeItem("editRecord");
-
-            alert("✅ Kayıt başarıyla güncellendi!");
-            window.location.href = "records.html";
-          }
-        };
       }
     });
   </script>
