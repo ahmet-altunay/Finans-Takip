@@ -129,5 +129,63 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 </script>
+<script>
+// Düzenleme Modu - Verileri forma doldur
+document.addEventListener("DOMContentLoaded", () => {
+  const editData = localStorage.getItem("editRecord");
+  
+  if (editData) {
+    const record = JSON.parse(editData);
+
+    document.getElementById("dateInput").value = record.date || "";
+    document.getElementById("type").value = record.type || "Gider";
+    
+    // Tür seçildikten sonra kategorileri yükle ve doğru kategoriyi seç
+    setTimeout(() => {
+      populateCategories();
+      document.getElementById("category").value = record.category || "";
+    }, 100);
+
+    document.getElementById("note").value = record.note || "";
+    document.getElementById("amount").value = record.amount || "";
+    document.getElementById("account").value = record.account || "";
+
+    // Başlığı değiştir
+    document.querySelector("h1").innerHTML = "📝 Kaydı Düzenle";
+
+    // Form submit'i güncelle (düzenleme modu)
+    const form = document.getElementById("transactionForm");
+    form.onsubmit = function(e) {
+      e.preventDefault();
+
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+
+      // Eşleşen kaydı bul
+      const index = transactions.findIndex(t => 
+        t.date === record.date && 
+        parseFloat(t.amount) === parseFloat(record.amount) &&
+        t.category === record.category
+      );
+
+      if (index !== -1) {
+        transactions[index] = {
+          date: document.getElementById("dateInput").value,
+          type: document.getElementById("type").value,
+          category: document.getElementById("category").value,
+          note: document.getElementById("note").value,
+          amount: parseFloat(document.getElementById("amount").value),
+          account: document.getElementById("account").value || "Nakit"
+        };
+
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        localStorage.removeItem("editRecord");
+
+        alert("✅ Kayıt başarıyla güncellendi!");
+        window.location.href = "records.html";
+      }
+    };
+  }
+});
+</script>
 </body>
 </html>
