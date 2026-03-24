@@ -3,67 +3,74 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Raporlar - Tüm Dönem</title>
+  <title>Raporlar - Aylık Özet</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .report-section {
       background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
     }
-    .type-header {
-      font-size: 1.4em;
-      margin: 25px 0 12px 0;
-      padding-bottom: 10px;
-      border-bottom: 3px solid;
-    }
-    .gelir-header { color: #28a745; border-color: #28a745; }
-    .gider-header { color: #dc3545; border-color: #dc3545; }
-    .transfer-header { color: #17a2b8; border-color: #17a2b8; }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 10px 0 20px 0;
+      margin: 15px 0;
+      font-size: 15px;
     }
     th, td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #eee;
+      padding: 12px 10px;
+      text-align: right;
+      border: 1px solid #ddd;
     }
     th {
-      background: #f8f9fa;
+      background: #007bff;
+      color: white;
+      text-align: center;
       font-weight: bold;
+    }
+    .month-cell {
+      text-align: left;
+      font-weight: bold;
+      background: #f8f9fa;
     }
     .total-row {
+      background: #e7f3ff;
       font-weight: bold;
-      background: #f0f8ff;
       font-size: 1.1em;
     }
-    .summary-box {
-      background: #e7f3ff;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 20px 0;
-      font-size: 1.3em;
-    }
+    .positive { color: #28a745; }
+    .negative { color: #dc3545; }
+    .transfer { color: #17a2b8; }
   </style>
 </head>
 <body>
-  <h1>📊 Tüm Dönem Raporu</h1>
-  <p style="text-align:center; color:#666;">Tüm kayıtlarınıza ait özet ve kategori dağılımları aşağıdadır.</p>
+  <h1>📊 Aylık Finansal Rapor (Tüm Dönem)</h1>
 
-  <!-- Genel Özet -->
   <div class="report-section">
-    <h2>Genel Finansal Özet</h2>
-    <div id="overallSummary" class="summary-box"></div>
-  </div>
-
-  <!-- Kategori Bazında Detaylı Dağılım -->
-  <div class="report-section">
-    <h2>Kategori Bazında Dağılım (Türlere Göre)</h2>
-    <div id="categoryReport"></div>
+    <h2>Aylık Gelir - Gider - Transfer Tablosu</h2>
+    <table id="monthlyTable">
+      <thead>
+        <tr>
+          <th>Ay</th>
+          <th>Gelir</th>
+          <th>Gider</th>
+          <th>Transfer</th>
+          <th>Net Bakiye</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td><strong>TOPLAM</strong></td>
+          <td id="totalIncome"></td>
+          <td id="totalExpense"></td>
+          <td id="totalTransfer"></td>
+          <td id="grandTotal"></td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
 
   <nav class="menu">
@@ -76,92 +83,80 @@
 
   <script src="app.js"></script>
   <script>
-    function generateAllReport() {
+    function generateMonthlyReport() {
       const transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
+      
       if (transactions.length === 0) {
-        document.getElementById("overallSummary").innerHTML = "<p>Henüz hiç kayıt yok.</p>";
-        document.getElementById("categoryReport").innerHTML = "";
+        document.getElementById("tableBody").innerHTML = 
+          `<tr><td colspan="5" style="text-align:center; padding:30px;">Henüz kayıt bulunmuyor.</td></tr>`;
         return;
       }
 
-      // Genel Özet Hesapla
-      let income = 0, expense = 0, transfer = 0;
-      transactions.forEach(t => {
-        const amt = parseFloat(t.amount) || 0;
-        if (t.type === "Gelir") income += amt;
-        else if (t.type === "Gider") expense += amt;
-        else if (t.type === "Transfer") transfer += amt;
-      });
-
-      const net = income - expense;
-
-      document.getElementById("overallSummary").innerHTML = `
-        <strong>Toplam Gelir:</strong> <span style="color:#28a745">${income.toLocaleString('tr-TR')} ₺</span><br>
-        <strong>Toplam Gider:</strong> <span style="color:#dc3545">${expense.toLocaleString('tr-TR')} ₺</span><br>
-        <strong>Toplam Transfer:</strong> <span style="color:#17a2b8">${transfer.toLocaleString('tr-TR')} ₺</span><br><br>
-        <strong style="font-size:1.4em; color:${net >= 0 ? '#28a745' : '#dc3545'}">
-          Net Bakiye: ${net.toLocaleString('tr-TR')} ₺
-        </strong>
-      `;
-
-      // Kategorileri Türlerine Göre Grupla
-      const groups = { Gelir: {}, Gider: {}, Transfer: {} };
+      // Aylara göre grupla
+      const monthlyData = {};
 
       transactions.forEach(t => {
-        if (!t.category) return;
-        const amt = parseFloat(t.amount) || 0;
-        if (groups[t.type]) {
-          groups[t.type][t.category] = (groups[t.type][t.category] || 0) + amt;
+        if (!t.date) return;
+        const yearMonth = t.date.substring(0, 7); // "2026-03"
+        
+        if (!monthlyData[yearMonth]) {
+          monthlyData[yearMonth] = { Gelir: 0, Gider: 0, Transfer: 0 };
         }
+
+        const amount = parseFloat(t.amount) || 0;
+        if (t.type === "Gelir") monthlyData[yearMonth].Gelir += amount;
+        else if (t.type === "Gider") monthlyData[yearMonth].Gider += amount;
+        else if (t.type === "Transfer") monthlyData[yearMonth].Transfer += amount;
       });
+
+      // Ayları sırala (en eskiden en yeniye)
+      const sortedMonths = Object.keys(monthlyData).sort();
 
       let html = "";
+      let grandIncome = 0, grandExpense = 0, grandTransfer = 0;
 
-      // GELİR
-      if (Object.keys(groups.Gelir).length > 0) {
-        html += `<h3 class="type-header gelir-header">📈 GELİR KATEGORİLERİ</h3>`;
-        html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
-        let totalIncome = 0;
-        Object.keys(groups.Gelir).sort().forEach(cat => {
-          const amount = groups.Gelir[cat];
-          html += `<tr><td>${cat}</td><td style="color:#28a745; font-weight:bold">${amount.toLocaleString('tr-TR')} ₺</td></tr>`;
-          totalIncome += amount;
-        });
-        html += `<tr class="total-row"><td><strong>Toplam Gelir</strong></td><td style="color:#28a745">${totalIncome.toLocaleString('tr-TR')} ₺</td></tr></table>`;
-      }
+      sortedMonths.forEach(month => {
+        const data = monthlyData[month];
+        const net = data.Gelir - data.Gider;
 
-      // GİDER
-      if (Object.keys(groups.Gider).length > 0) {
-        html += `<h3 class="type-header gider-header">📉 GİDER KATEGORİLERİ</h3>`;
-        html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
-        let totalExpense = 0;
-        Object.keys(groups.Gider).sort().forEach(cat => {
-          const amount = groups.Gider[cat];
-          html += `<tr><td>${cat}</td><td style="color:#dc3545; font-weight:bold">${amount.toLocaleString('tr-TR')} ₺</td></tr>`;
-          totalExpense += amount;
-        });
-        html += `<tr class="total-row"><td><strong>Toplam Gider</strong></td><td style="color:#dc3545">${totalExpense.toLocaleString('tr-TR')} ₺</td></tr></table>`;
-      }
+        grandIncome += data.Gelir;
+        grandExpense += data.Gider;
+        grandTransfer += data.Transfer;
 
-      // TRANSFER
-      if (Object.keys(groups.Transfer).length > 0) {
-        html += `<h3 class="type-header transfer-header">🔄 TRANSFER KATEGORİLERİ</h3>`;
-        html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
-        let totalTransfer = 0;
-        Object.keys(groups.Transfer).sort().forEach(cat => {
-          const amount = groups.Transfer[cat];
-          html += `<tr><td>${cat}</td><td style="color:#17a2b8; font-weight:bold">${amount.toLocaleString('tr-TR')} ₺</td></tr>`;
-          totalTransfer += amount;
-        });
-        html += `<tr class="total-row"><td><strong>Toplam Transfer</strong></td><td style="color:#17a2b8">${totalTransfer.toLocaleString('tr-TR')} ₺</td></tr></table>`;
-      }
+        // Ay ismini güzel göster (2026-03 → Mart 2026)
+        const date = new Date(month + "-01");
+        const monthName = date.toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' });
 
-      document.getElementById("categoryReport").innerHTML = html;
+        html += `
+          <tr>
+            <td class="month-cell">${monthName}</td>
+            <td class="positive">${data.Gelir.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+            <td class="negative">${data.Gider.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+            <td class="transfer">${data.Transfer.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>
+            <td class="${net >= 0 ? 'positive' : 'negative'}">
+              ${net.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺
+            </td>
+          </tr>`;
+      });
+
+      // Toplam Satırı
+      const grandNet = grandIncome - grandExpense;
+
+      document.getElementById("tableBody").innerHTML = html;
+      document.getElementById("totalIncome").innerHTML = 
+        `<span class="positive">${grandIncome.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</span>`;
+      document.getElementById("totalExpense").innerHTML = 
+        `<span class="negative">${grandExpense.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</span>`;
+      document.getElementById("totalTransfer").innerHTML = 
+        `<span class="transfer">${grandTransfer.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</span>`;
+      document.getElementById("grandTotal").innerHTML = 
+        `<span class="${grandNet >= 0 ? 'positive' : 'negative'}">
+          ${grandNet.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺
+        </span>`;
     }
 
     // Sayfa yüklendiğinde raporu üret
-    document.addEventListener("DOMContentLoaded", generateAllReport);
+    document.addEventListener("DOMContentLoaded", generateMonthlyReport);
   </script>
 </body>
 </html>
