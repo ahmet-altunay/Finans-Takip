@@ -25,9 +25,6 @@
       border-radius: 8px;
       cursor: pointer;
     }
-    #csvBtn:hover {
-      background: #218838;
-    }
   </style>
 </head>
 <body>
@@ -49,7 +46,7 @@
     <button type="button" id="addCategoryBtn">+ Yeni Kategori Ekle</button>
 
     <div id="newCategoryDiv">
-      <input type="text" id="newCategory" placeholder="Yeni kategori adı" style="width:70%; display:inline-block;">
+      <input type="text" id="newCategory" placeholder="Yeni kategori adı" style="width:70%;">
       <button type="button" id="saveCategoryBtn" style="width:28%;">Kaydet</button>
     </div>
 
@@ -81,32 +78,50 @@
   <script src="app.js"></script>
 
   <script>
-    // Sayfa yüklendiğinde hesapları ve kategorileri doldur
     document.addEventListener("DOMContentLoaded", () => {
-      populateAccounts();   // Hesap / Kart dropdown'ını doldur
-      populateCategories(); // Kategorileri doldur (ilk yükleme)
+      // === HESAP / KART DOLDUR ===
+      function loadAccountsDropdown() {
+        const select = document.getElementById("account");
+        select.innerHTML = '<option value="">Hesap / Kart seçin...</option>';
 
-      // Tür değiştiğinde kategorileri yenile
+        const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+        
+        if (accounts.length === 0) {
+          const opt = document.createElement("option");
+          opt.value = "";
+          opt.textContent = "Henüz hesap eklenmedi";
+          select.appendChild(opt);
+          return;
+        }
+
+        accounts.forEach(acc => {
+          const opt = document.createElement("option");
+          opt.value = acc.name;
+          opt.textContent = acc.name + " (" + acc.type + ")";
+          select.appendChild(opt);
+        });
+      }
+
+      loadAccountsDropdown();
+
+      // Kategori doldurma
+      populateCategories();
+
       document.getElementById("type").addEventListener("change", populateCategories);
 
-      // Yeni kategori butonu
+      // Diğer event'ler
       document.getElementById("addCategoryBtn").addEventListener("click", () => {
         document.getElementById("newCategoryDiv").style.display = "block";
       });
 
       document.getElementById("saveCategoryBtn").addEventListener("click", addNewCategory);
-
-      // Form submit
       document.getElementById("transactionForm").addEventListener("submit", addTransaction);
-
-      // CSV butonu
       document.getElementById("csvBtn").addEventListener("click", importCSV);
 
-      // Düzenleme modu kontrolü
+      // Düzenleme modu
       const editData = localStorage.getItem("editRecord");
       if (editData) {
         const record = JSON.parse(editData);
-
         document.getElementById("dateInput").value = record.date || "";
         document.getElementById("type").value = record.type || "Gider";
         document.getElementById("note").value = record.note || "";
@@ -115,10 +130,8 @@
 
         setTimeout(() => {
           populateCategories();
-          setTimeout(() => {
-            document.getElementById("category").value = record.category || "";
-          }, 100);
-        }, 50);
+          document.getElementById("category").value = record.category || "";
+        }, 100);
 
         document.querySelector("h1").innerHTML = "📝 Kaydı Düzenle";
       }
