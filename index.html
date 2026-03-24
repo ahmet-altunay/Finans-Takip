@@ -3,133 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💰 Finans Takip Sistemi</title>
+  <title>💰 Ahmet'in Finans Takibi</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 20px;
-      background: #f8f9fa;
-      color: #333;
-    }
-    h1 {
-      text-align: center;
-      color: #007bff;
-      margin-bottom: 10px;
-    }
-    #date, #clock {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 8px 0;
-      color: #555;
-      text-align: center;
-    }
-    #balances {
-      margin: 25px 0;
-      padding: 15px;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      text-align: center;
-    }
-    .balance-item {
-      margin: 12px 0;
-      font-size: 17px;
-    }
-    nav.menu {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 30px;
-    }
-    nav.menu a {
-      padding: 14px;
-      font-size: 17px;
-      text-align: center;
-      background: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      transition: all 0.3s;
-    }
-    nav.menu a:hover {
-      background: #0056b3;
-      transform: translateY(-2px);
-    }
-    .footer {
-      text-align: center;
-      margin-top: 40px;
-      font-size: 14px;
-      color: #888;
-    }
-  </style>
 </head>
-
 <body>
   <h1>💰 Ahmet'in Finans Takibi</h1>
-
-  <!-- Canlı Tarih ve Saat -->
+  
   <div id="date"></div>
   <div id="clock"></div>
 
-  <!-- Bakiyeler -->
-  <div id="balances">
+  <div id="balances" class="balances-box">
     <p><strong>Toplam Bakiye:</strong> <span id="total-balance">0,00 ₺</span></p>
-    <div class="balance-item">
-      Gelir: <span id="total-income" style="color:#28a745;">0,00 ₺</span> | 
-      Gider: <span id="total-expense" style="color:#dc3545;">0,00 ₺</span>
-    </div>
+    <p>Gelir: <span id="total-income" style="color:#28a745;">0,00 ₺</span> | 
+       Gider: <span id="total-expense" style="color:#dc3545;">0,00 ₺</span></p>
   </div>
 
-  <!-- Menü -->
   <nav class="menu">
-    <a href="add.html">📌 Kayıt Ekle</a>
+    <a href="add.html">📌 Yeni Kayıt Ekle</a>
     <a href="records.html">📋 Tüm Kayıtlar</a>
-    <a href="report.html">📊 Raporlar ve Grafikler</a>
+    <a href="report.html">📊 Raporlar</a>
     <a href="accounts.html">💳 Hesap / Kartlar</a>
+    <a href="category.html">📂 Kategori Yönetimi</a>
   </nav>
 
-  <div class="footer">
-    Telefon ve bilgisayardan sorunsuz çalışır • Grok ile geliştiriliyor
-  </div>
-
-  <script>
-    function startClock() {
-      function updateClock() {
-        const now = new Date();
-
-        const dateStr = now.toLocaleDateString("tr-TR", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric"
-        });
-
-        const timeStr = now.toLocaleTimeString("tr-TR", { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-        document.getElementById("date").textContent = dateStr;
-        document.getElementById("clock").textContent = timeStr;
-      }
-
-      updateClock();
-      setInterval(updateClock, 1000);
-    }
-
-    // Basit bakiye gösterme (şimdilik sabit, ileride localStorage'dan çekeceğiz)
-    function updateBalances() {
-      // Şimdilik örnek değerler
-      document.getElementById("total-balance").textContent = "2.450,75 ₺";
-      document.getElementById("total-income").textContent = "5.200,00 ₺";
-      document.getElementById("total-expense").textContent = "2.749,25 ₺";
-    }
-
-    // Sayfa yüklendiğinde çalıştır
-    document.addEventListener("DOMContentLoaded", () => {
-      startClock();
-      updateBalances();
-    });
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>

@@ -5,97 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Raporlar</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 1000px;
-      margin: 0 auto;
-      padding: 15px;
-      background: #f8f9fa;
-    }
-    h1 {
-      text-align: center;
-      color: #007bff;
-    }
-    label {
-      font-weight: bold;
-      margin-right: 10px;
-    }
-    section {
-      margin: 25px 0;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    h2 {
-      color: #333;
-      border-bottom: 2px solid #007bff;
-      padding-bottom: 8px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #007bff;
-      color: white;
-    }
-    .summary {
-      font-size: 18px;
-      font-weight: bold;
-      margin: 15px 0;
-      padding: 15px;
-      background: #f0f8ff;
-      border-radius: 8px;
-    }
-    .income { color: #28a745; }
-    .expense { color: #dc3545; }
-
-    nav.menu {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    nav.menu a {
-      padding: 12px;
-      text-align: center;
-      background: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-    }
-
-    /* Mobil uyum */
-    @media (max-width: 768px) {
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-      thead tr { position: absolute; top: -9999px; left: -9999px; }
-      tr { margin-bottom: 15px; border: 1px solid #ccc; }
-      td {
-        border: none;
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-      }
-      td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        font-weight: bold;
-        color: #007bff;
-      }
-    }
-  </style>
 </head>
 <body>
   <h1>📊 Raporlar ve Özetler</h1>
@@ -105,22 +14,14 @@
 
   <div id="emptyMessage" style="color: gray; margin-top: 15px;"></div>
 
-  <!-- Gelir / Gider Özeti -->
   <section>
     <h2>Gelir ve Gider Özeti</h2>
     <div id="incomeExpenseReport" class="summary"></div>
   </section>
 
-  <!-- Kategori Bazında Dağılım -->
   <section>
     <h2>Kategori Bazında Dağılım</h2>
     <div id="categoryReport"></div>
-  </section>
-
-  <!-- Kredi Kartı Borçları -->
-  <section>
-    <h2>Kredi Kartı Borçları</h2>
-    <div id="creditCardReport"></div>
   </section>
 
   <nav class="menu">
@@ -128,10 +29,10 @@
     <a href="add.html">Kayıt Ekle</a>
     <a href="records.html">Kayıtlar</a>
     <a href="accounts.html">Hesap/Kartlar</a>
+    <a href="category.html">Kategori Yönetimi</a>
   </nav>
 
   <script src="app.js"></script>
-
   <script>
     function generateReport() {
       const monthInput = document.getElementById("monthSelect").value;
@@ -149,13 +50,11 @@
         emptyMsg.textContent = "Bu ay için kayıt bulunamadı.";
         document.getElementById("incomeExpenseReport").innerHTML = "";
         document.getElementById("categoryReport").innerHTML = "";
-        document.getElementById("creditCardReport").innerHTML = "";
         return;
       }
 
       emptyMsg.textContent = "";
 
-      // Gelir - Gider Hesapla
       let income = 0, expense = 0;
       filtered.forEach(t => {
         const amt = parseFloat(t.amount) || 0;
@@ -164,12 +63,12 @@
       });
 
       document.getElementById("incomeExpenseReport").innerHTML = `
-        <span class="income">Gelir: ${income.toLocaleString('tr-TR')} ₺</span> | 
-        <span class="expense">Gider: ${expense.toLocaleString('tr-TR')} ₺</span><br>
+        <span style="color:#28a745">Gelir: ${income.toLocaleString('tr-TR')} ₺</span> | 
+        <span style="color:#dc3545">Gider: ${expense.toLocaleString('tr-TR')} ₺</span><br>
         <strong>Net: ${(income - expense).toLocaleString('tr-TR')} ₺</strong>
       `;
 
-      // Kategori Bazında Özet (basit tablo)
+      // Kategori Bazında Özet
       const catMap = {};
       filtered.forEach(t => {
         if (t.type === "Gider" && t.category) {
@@ -183,32 +82,13 @@
       });
       catHtml += "</table>";
       document.getElementById("categoryReport").innerHTML = catHtml;
-
-      // Kredi Kartı Raporu
-      const credit = filtered.filter(t => t.account && t.account.includes("Kredi"));
-      let ccHtml = credit.length ? 
-        "<table><tr><th>Kart</th><th>Tutar</th><th>Son Ödeme</th></tr>" : 
-        "<p>Bu ay kredi kartı hareketi yok.</p>";
-
-      credit.forEach(t => {
-        ccHtml += `<tr><td>${t.account}</td><td>${parseFloat(t.amount).toLocaleString('tr-TR')} ₺</td><td>${t.dueDate || "-"}</td></tr>`;
-      });
-      if (credit.length) ccHtml += "</table>";
-      document.getElementById("creditCardReport").innerHTML = ccHtml;
     }
 
-    // Sayfa yüklendiğinde ve ay değiştiğinde rapor üret
     document.addEventListener("DOMContentLoaded", () => {
       const monthInput = document.getElementById("monthSelect");
-      
-      // Bugünün ayını varsayılan olarak seç
-      const today = new Date();
-      const currentMonth = today.toISOString().slice(0, 7);
-      monthInput.value = currentMonth;
-
+      const today = new Date().toISOString().slice(0, 7);
+      monthInput.value = today;
       monthInput.addEventListener("change", generateReport);
-      
-      // İlk yüklemede rapor göster
       generateReport();
     });
   </script>

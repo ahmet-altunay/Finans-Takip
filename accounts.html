@@ -5,92 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Hesap / Kartlar</title>
   <link rel="stylesheet" href="style.css">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 15px;
-      background: #f8f9fa;
-    }
-    h1 { text-align: center; color: #007bff; }
-    .add-account {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 25px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    input, select, button {
-      padding: 10px;
-      margin: 8px 5px 8px 0;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover { background: #0056b3; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: center;
-    }
-    th { background: #007bff; color: white; }
-    .delete-btn {
-      background: #dc3545;
-      color: white;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    nav.menu {
-      margin-top: 30px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    nav.menu a {
-      padding: 12px;
-      text-align: center;
-      background: #007bff;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-    }
-
-    @media (max-width: 768px) {
-      table, thead, tbody, th, td, tr { display: block; }
-      thead tr { position: absolute; top: -9999px; left: -9999px; }
-      tr { margin-bottom: 15px; border: 1px solid #ccc; }
-      td {
-        border: none;
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-      }
-      td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 10px;
-        font-weight: bold;
-        color: #007bff;
-      }
-    }
-  </style>
 </head>
 <body>
   <h1>💳 Hesap ve Kartlar</h1>
@@ -130,37 +44,35 @@
     <a href="add.html">Kayıt Ekle</a>
     <a href="records.html">Kayıtlar</a>
     <a href="report.html">Raporlar</a>
+    <a href="category.html">Kategori Yönetimi</a>
   </nav>
 
   <script src="app.js"></script>
-
   <script>
     function loadAccounts() {
-      const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+      const accs = JSON.parse(localStorage.getItem("accounts")) || [];
       const tbody = document.getElementById("accountsList");
       const emptyMsg = document.getElementById("emptyMessage");
 
       tbody.innerHTML = "";
 
-      if (accounts.length === 0) {
+      if (accs.length === 0) {
         emptyMsg.style.display = "block";
         return;
       }
 
       emptyMsg.style.display = "none";
 
-      accounts.forEach((acc, index) => {
+      accs.forEach((acc, index) => {
         const balance = parseFloat(acc.balance) || 0;
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td data-label="Adı">${acc.name}</td>
-          <td data-label="Tür">${acc.type}</td>
-          <td data-label="Bakiye" style="font-weight:bold; color:${balance >= 0 ? '#28a745' : '#dc3545'}">
+          <td>${acc.name}</td>
+          <td>${acc.type}</td>
+          <td style="font-weight:bold; color:${balance >= 0 ? '#28a745' : '#dc3545'}">
             ${balance.toLocaleString('tr-TR')} ₺
           </td>
-          <td data-label="İşlemler">
-            <button class="delete-btn" onclick="deleteAccount(${index})">Sil</button>
-          </td>
+          <td><button class="delete-btn" onclick="deleteAccount(${index})">Sil</button></td>
         `;
         tbody.appendChild(row);
       });
@@ -169,33 +81,31 @@
     function addAccount() {
       const name = document.getElementById("accountName").value.trim();
       const type = document.getElementById("accountType").value;
-      let balance = parseFloat(document.getElementById("initialBalance").value) || 0;
+      const balance = parseFloat(document.getElementById("initialBalance").value) || 0;
 
-      if (!name) {
-        alert("Hesap/Kart adı giriniz!");
-        return;
-      }
+      if (!name) return alert("Hesap/Kart adı giriniz!");
 
-      let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-      accounts.push({ name, type, balance });
-
-      localStorage.setItem("accounts", JSON.stringify(accounts));
+      let accs = JSON.parse(localStorage.getItem("accounts")) || [];
+      accs.push({ name, type, balance });
+      localStorage.setItem("accounts", JSON.stringify(accs));
 
       document.getElementById("accountName").value = "";
       document.getElementById("initialBalance").value = "";
 
       loadAccounts();
-      alert("✅ Hesap başarıyla eklendi!");
+      populateAccounts(); // add.html dropdown'ı güncelle
+      alert("✅ Hesap eklendi!");
     }
 
-    function deleteAccount(index) {
-      if (confirm("Bu hesabı silmek istediğinden emin misin?")) {
-        let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-        accounts.splice(index, 1);
-        localStorage.setItem("accounts", JSON.stringify(accounts));
+    window.deleteAccount = function(index) {
+      if (confirm("Bu hesabı silmek istediğinize emin misiniz?")) {
+        let accs = JSON.parse(localStorage.getItem("accounts")) || [];
+        accs.splice(index, 1);
+        localStorage.setItem("accounts", JSON.stringify(accs));
         loadAccounts();
+        populateAccounts();
       }
-    }
+    };
 
     document.addEventListener("DOMContentLoaded", loadAccounts);
   </script>
