@@ -338,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (csvBtn) {
     csvBtn.addEventListener("click", importCSV);
   }
-  // ===================== HESAP / KART DROPDOWN DOLDURMA =====================
+// ===================== HESAP / KART DROPDOWN DOLDURMA =====================
 function populateAccounts() {
   const select = document.getElementById("account");
   if (!select) return;
@@ -360,5 +360,7 @@ function populateAccounts() {
     opt.value = acc.name;
     opt.textContent = `${acc.name} (${acc.type})`;
     select.appendChild(opt);
+  });
 }
-)};
+  
+});
