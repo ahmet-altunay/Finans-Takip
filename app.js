@@ -360,8 +360,8 @@ function populateAccounts() {
     opt.value = acc.name;
     opt.textContent = `${acc.name} (${acc.type})`;
     select.appendChild(opt);
-  });
 }
+
 // GELİR RAPORU (kategoriler satır, aylar sütun)
 let gelirHTML = `<table><tr><th>Kategori</th>`;
 sortedMonths.forEach(m => {
