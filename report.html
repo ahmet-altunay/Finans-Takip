@@ -5,24 +5,65 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Raporlar</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .report-section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 25px;
+    }
+    .type-header {
+      font-size: 1.3em;
+      margin: 20px 0 10px 0;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #007bff;
+    }
+    .gelir-header { color: #28a745; border-color: #28a745; }
+    .gider-header { color: #dc3545; border-color: #dc3545; }
+    .transfer-header { color: #17a2b8; border-color: #17a2b8; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #f8f9fa;
+      font-weight: bold;
+    }
+    .summary {
+      font-size: 1.4em;
+      padding: 15px;
+      background: #f0f8ff;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+  </style>
 </head>
 <body>
   <h1>📊 Raporlar ve Özetler</h1>
 
-  <label>Ay Seç:</label>
-  <input type="month" id="monthSelect">
+  <label><strong>Ay Seç:</strong></label>
+  <input type="month" id="monthSelect" style="padding:8px; font-size:16px;">
 
-  <div id="emptyMessage" style="color: gray; margin-top: 15px;"></div>
+  <div id="emptyMessage" style="color: gray; margin: 20px 0; font-size: 18px;"></div>
 
-  <section>
-    <h2>Gelir ve Gider Özeti</h2>
+  <!-- Genel Özet -->
+  <div class="report-section">
+    <h2>Gelir - Gider - Transfer Özeti</h2>
     <div id="incomeExpenseReport" class="summary"></div>
-  </section>
+  </div>
 
-  <section>
-    <h2>Kategori Bazında Dağılım</h2>
+  <!-- Kategori Bazında Detaylı Dağılım -->
+  <div class="report-section">
+    <h2>Kategori Bazında Dağılım (Türlere Göre)</h2>
     <div id="categoryReport"></div>
-  </section>
+  </div>
 
   <nav class="menu">
     <a href="index.html">Ana Sayfa</a>
@@ -44,10 +85,11 @@
         return;
       }
 
+      // Seçilen aya ait kayıtları filtrele
       const filtered = transactions.filter(t => t.date && t.date.startsWith(monthInput));
 
       if (filtered.length === 0) {
-        emptyMsg.textContent = "Bu ay için kayıt bulunamadı.";
+        emptyMsg.textContent = "Bu ay için herhangi bir kayıt bulunamadı.";
         document.getElementById("incomeExpenseReport").innerHTML = "";
         document.getElementById("categoryReport").innerHTML = "";
         return;
@@ -55,39 +97,78 @@
 
       emptyMsg.textContent = "";
 
-      let income = 0, expense = 0;
+      // Genel Özet Hesapla
+      let income = 0, expense = 0, transfer = 0;
       filtered.forEach(t => {
         const amt = parseFloat(t.amount) || 0;
         if (t.type === "Gelir") income += amt;
         else if (t.type === "Gider") expense += amt;
+        else if (t.type === "Transfer") transfer += amt;
       });
 
       document.getElementById("incomeExpenseReport").innerHTML = `
-        <span style="color:#28a745">Gelir: ${income.toLocaleString('tr-TR')} ₺</span> | 
-        <span style="color:#dc3545">Gider: ${expense.toLocaleString('tr-TR')} ₺</span><br>
-        <strong>Net: ${(income - expense).toLocaleString('tr-TR')} ₺</strong>
+        <strong>Gelir:</strong> <span style="color:#28a745">${income.toLocaleString('tr-TR')} ₺</span><br>
+        <strong>Gider:</strong> <span style="color:#dc3545">${expense.toLocaleString('tr-TR')} ₺</span><br>
+        <strong>Transfer:</strong> <span style="color:#17a2b8">${transfer.toLocaleString('tr-TR')} ₺</span><br><br>
+        <strong style="font-size:1.2em;">Net Bakiye: ${(income - expense).toLocaleString('tr-TR')} ₺</strong>
       `;
 
-      // Kategori Bazında Özet
-      const catMap = {};
+      // Kategori Bazında Dağılım (Türlere göre grupla)
+      const groups = {
+        Gelir: {},
+        Gider: {},
+        Transfer: {}
+      };
+
       filtered.forEach(t => {
-        if (t.type === "Gider" && t.category) {
-          catMap[t.category] = (catMap[t.category] || 0) + parseFloat(t.amount);
+        if (!t.category) return;
+        const amt = parseFloat(t.amount) || 0;
+        if (groups[t.type]) {
+          groups[t.type][t.category] = (groups[t.type][t.category] || 0) + amt;
         }
       });
 
-      let catHtml = "<table><tr><th>Kategori</th><th>Tutar</th></tr>";
-      Object.keys(catMap).forEach(cat => {
-        catHtml += `<tr><td>${cat}</td><td>${catMap[cat].toLocaleString('tr-TR')} ₺</td></tr>`;
-      });
-      catHtml += "</table>";
-      document.getElementById("categoryReport").innerHTML = catHtml;
+      let html = "";
+
+      // Gelir Grubu
+      if (Object.keys(groups.Gelir).length > 0) {
+        html += `<h3 class="type-header gelir-header">📈 GELİR KATEGORİLERİ</h3>`;
+        html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
+        Object.keys(groups.Gelir).sort().forEach(cat => {
+          html += `<tr><td>${cat}</td><td style="color:#28a745; font-weight:bold">${groups.Gelir[cat].toLocaleString('tr-TR')} ₺</td></tr>`;
+        });
+        html += `</table>`;
+      }
+
+      // Gider Grubu
+      if (Object.keys(groups.Gider).length > 0) {
+        html += `<h3 class="type-header gider-header">📉 GİDER KATEGORİLERİ</h3>`;
+        html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
+        Object.keys(groups.Gider).sort().forEach(cat => {
+          html += `<tr><td>${cat}</td><td style="color:#dc3545; font-weight:bold">${groups.Gider[cat].toLocaleString('tr-TR')} ₺</td></tr>`;
+        });
+        html += `</table>`;
+      }
+
+      // Transfer Grubu
+      if (Object.keys(groups.Transfer).length > 0) {
+        html += `<h3 class="type-header transfer-header">🔄 TRANSFER KATEGORİLERİ</h3>`;
+        html += `<table><tr><th>Kategori</th><th>Tutar</th></tr>`;
+        Object.keys(groups.Transfer).sort().forEach(cat => {
+          html += `<tr><td>${cat}</td><td style="color:#17a2b8; font-weight:bold">${groups.Transfer[cat].toLocaleString('tr-TR')} ₺</td></tr>`;
+        });
+        html += `</table>`;
+      }
+
+      document.getElementById("categoryReport").innerHTML = html;
     }
 
+    // Sayfa yüklendiğinde
     document.addEventListener("DOMContentLoaded", () => {
       const monthInput = document.getElementById("monthSelect");
       const today = new Date().toISOString().slice(0, 7);
       monthInput.value = today;
+
       monthInput.addEventListener("change", generateReport);
       generateReport();
     });
