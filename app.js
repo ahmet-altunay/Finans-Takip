@@ -338,4 +338,28 @@ document.addEventListener("DOMContentLoaded", () => {
   if (csvBtn) {
     csvBtn.addEventListener("click", importCSV);
   }
+  // ===================== HESAP / KART DROPDOWN DOLDURMA =====================
+function populateAccounts() {
+  const select = document.getElementById("account");
+  if (!select) return;
+
+  select.innerHTML = '<option value="">Hesap / Kart seçin...</option>';
+
+  const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+
+  if (accounts.length === 0) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "Henüz hesap eklenmedi";
+    select.appendChild(opt);
+    return;
+  }
+
+  accounts.forEach(acc => {
+    const opt = document.createElement("option");
+    opt.value = acc.name;
+    opt.textContent = `${acc.name} (${acc.type})`;
+    select.appendChild(opt);
+  });
+}
 });
