@@ -1,4 +1,4 @@
-// ===================== app.js - Düzeltilmiş ve Entegre Versiyon =====================
+// ===================== app.js - TAM DÜZELTİLMİŞ VERSİYON =====================
 
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
@@ -32,7 +32,7 @@ function updateBalances() {
   document.getElementById("total-balance") && (document.getElementById("total-balance").textContent = balance.toLocaleString('tr-TR') + " ₺");
 }
 
-// Kategorileri Doldur (add.html için)
+// Kategorileri Doldur
 function populateCategories() {
   const type = document.getElementById("type")?.value || "Gider";
   const catSelect = document.getElementById("category");
@@ -55,27 +55,25 @@ function populateCategories() {
   });
 }
 
-// Yeni Kategori Ekle
+// Yeni Kategori Ekle (add.html içinden)
 function addNewCategory() {
-  const newCatInput = document.getElementById("newCategory");
-  if (!newCatInput) return;
-  const newCat = newCatInput.value.trim();
+  const newCat = document.getElementById("newCategory").value.trim();
   if (!newCat) return alert("Kategori adı boş olamaz!");
 
   if (kategoriler.some(k => k.ad === newCat)) return alert("Bu kategori zaten mevcut!");
 
-  const currentType = document.getElementById("type")?.value || "Gider";
+  const currentType = document.getElementById("type").value;
   const tip = currentType === "Gelir" ? "gelir" : currentType === "Gider" ? "gider" : "transfer";
 
   kategoriler.push({ ad: newCat, tip: tip });
   localStorage.setItem("kategoriler", JSON.stringify(kategoriler));
 
-  newCatInput.value = "";
+  document.getElementById("newCategory").value = "";
   populateCategories();
   alert("✅ Yeni kategori eklendi: " + newCat);
 }
 
-// Kayıt Ekle
+// ===================== YENİ KAYIT EKLEME =====================
 function addTransaction(e) {
   e.preventDefault();
 
@@ -88,8 +86,8 @@ function addTransaction(e) {
     account: document.getElementById("account").value || "Nakit"
   };
 
-  if (!record.date || !record.amount || !record.category) {
-    alert("❌ Tarih, Tutar ve Kategori zorunludur!");
+  if (!record.date || isNaN(record.amount) || !record.category) {
+    alert("❌ Tarih, Tutar ve Kategori alanlarını doldurunuz!");
     return;
   }
 
@@ -102,18 +100,51 @@ function addTransaction(e) {
   updateBalances();
 }
 
-// Hesapları Dropdown'a Doldur
-function populateAccounts() {
-  const select = document.getElementById("account");
-  if (!select) return;
-  select.innerHTML = "<option value=''>Hesap seçin</option>";
+// ===================== CSV İÇE AKTARMA =====================
+function importCSV() {
+  const fileInput = document.getElementById("csvFile");
+  if (!fileInput || !fileInput.files[0]) {
+    alert("Lütfen bir CSV dosyası seçin!");
+    return;
+  }
 
-  accounts.forEach(acc => {
-    const opt = document.createElement("option");
-    opt.value = acc.name;
-    opt.textContent = acc.name;
-    select.appendChild(opt);
-  });
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const lines = e.target.result.split("\n");
+    let added = 0;
+
+    for (let i = 1; i < lines.length; i++) {   // ilk satır başlık ise atla
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      const cols = line.split(",");
+      if (cols.length < 5) continue;
+
+      const record = {
+        date: cols[0].trim(),
+        type: cols[1].trim(),
+        category: cols[2].trim(),
+        note: cols[3] ? cols[3].trim() : "",
+        amount: parseFloat(cols[4].trim().replace(",", ".")),
+        account: cols[5] ? cols[5].trim() : "Nakit"
+      };
+
+      if (record.date && !isNaN(record.amount) && record.category) {
+        transactions.push(record);
+        added++;
+      }
+    }
+
+    if (added > 0) {
+      localStorage.setItem("transactions", JSON.stringify(transactions));
+      alert(`${added} kayıt CSV'den başarıyla yüklendi!`);
+      updateBalances();
+    } else {
+      alert("CSV dosyasında geçerli kayıt bulunamadı.");
+    }
+  };
+
+  reader.readAsText(fileInput.files[0], "UTF-8");
 }
 
 // ===================== SAYFA YÜKLENDİĞİNDE =====================
@@ -121,10 +152,9 @@ document.addEventListener("DOMContentLoaded", () => {
   startClock();
   updateBalances();
 
-  // add.html sayfası için
+  // add.html için
   if (document.getElementById("transactionForm")) {
     populateCategories();
-    populateAccounts();
     document.getElementById("type").addEventListener("change", populateCategories);
 
     document.getElementById("addCategoryBtn").addEventListener("click", () => {
@@ -133,5 +163,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById("saveCategoryBtn").addEventListener("click", addNewCategory);
     document.getElementById("transactionForm").addEventListener("submit", addTransaction);
+  }
+
+  // CSV butonu için (add.html)
+  const csvBtn = document.getElementById("csvBtn");
+  if (csvBtn) {
+    csvBtn.addEventListener("click", importCSV);
   }
 });
