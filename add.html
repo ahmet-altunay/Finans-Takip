@@ -78,5 +78,56 @@
   </nav>
 
   <script src="app.js"></script>
+
+  <script>
+// Düzenleme modu kontrolü
+document.addEventListener("DOMContentLoaded", () => {
+  const editData = localStorage.getItem("editRecord");
+  if (editData) {
+    const { index, record } = JSON.parse(editData);
+    
+    document.getElementById("dateInput").value = record.date || "";
+    document.getElementById("type").value = record.type || "Gider";
+    document.getElementById("category").value = record.category || "";
+    document.getElementById("note").value = record.note || "";
+    document.getElementById("amount").value = record.amount || "";
+    document.getElementById("account").value = record.account || "";
+
+    // Başlığı değiştir
+    document.querySelector("h1").textContent = "📝 Kaydı Düzenle";
+
+    // Form submit olayını değiştir
+    const form = document.getElementById("transactionForm");
+    form.onsubmit = function(e) {
+      e.preventDefault();
+      
+      let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+      
+      // Gerçek index'i bul (tarih + tutar + kategori ile)
+      const realIndex = transactions.findIndex(t => 
+        t.date === record.date && 
+        parseFloat(t.amount) === parseFloat(record.amount) && 
+        t.category === record.category
+      );
+
+      if (realIndex !== -1) {
+        transactions[realIndex] = {
+          date: document.getElementById("dateInput").value,
+          type: document.getElementById("type").value,
+          category: document.getElementById("category").value,
+          note: document.getElementById("note").value,
+          amount: parseFloat(document.getElementById("amount").value),
+          account: document.getElementById("account").value || "Nakit"
+        };
+
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        alert("✅ Kayıt başarıyla güncellendi!");
+        localStorage.removeItem("editRecord");
+        window.location.href = "records.html";
+      }
+    };
+  }
+});
+</script>
 </body>
 </html>

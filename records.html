@@ -5,6 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tüm Kayıtlar</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .actions button {
+      margin: 2px;
+      padding: 6px 12px;
+      font-size: 13px;
+    }
+    .edit-btn {
+      background: #ffc107;
+      color: black;
+    }
+    .edit-btn:hover {
+      background: #e0a800;
+    }
+  </style>
 </head>
 <body>
   <h1>📋 Tüm Kayıtlar</h1>
@@ -38,8 +52,14 @@
 
   <script src="app.js"></script>
   <script>
+    let currentEditIndex = -1;   // Düzenleme için index tutuyoruz
+
     function loadRecords() {
-      const records = JSON.parse(localStorage.getItem("transactions")) || [];
+      let records = JSON.parse(localStorage.getItem("transactions")) || [];
+      
+      // Tarihe göre yeniden eskiye sırala (en yeni üstte)
+      records.sort((a, b) => new Date(b.date) - new Date(a.date));
+
       const tbody = document.getElementById("recordsList");
       const emptyMsg = document.getElementById("emptyMessage");
       const table = document.getElementById("recordsTable");
@@ -68,7 +88,8 @@
             ${Number(rec.amount).toLocaleString('tr-TR')} ₺
           </td>
           <td>${rec.account || "Nakit"}</td>
-          <td>
+          <td class="actions">
+            <button class="edit-btn" onclick="editRecord(${index})">Düzenle</button>
             <button class="delete-btn" onclick="deleteRecord(${index})">Sil</button>
           </td>
         `;
@@ -76,13 +97,41 @@
       });
     }
 
+    // Kayıt Düzenleme
+    window.editRecord = function(index) {
+      let records = JSON.parse(localStorage.getItem("transactions")) || [];
+      
+      // Tarihe göre sıralı listeden gerçek index'i bul
+      records.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const rec = records[index];
+
+      // add.html sayfasına yönlendir ve verileri doldur
+      localStorage.setItem("editRecord", JSON.stringify({index: index, record: rec}));
+      window.location.href = "add.html";
+    };
+
+    // Kayıt Silme
     window.deleteRecord = function(index) {
       if (confirm("Bu kaydı silmek istediğinize emin misiniz?")) {
         let records = JSON.parse(localStorage.getItem("transactions")) || [];
-        records.splice(index, 1);
-        localStorage.setItem("transactions", JSON.stringify(records));
+        records.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const realIndex = records[index]; // sıralı listeden gerçek kaydı al
+
+        // Gerçek index'i bulup sil
+        let originalRecords = JSON.parse(localStorage.getItem("transactions")) || [];
+        const originalIndex = originalRecords.findIndex(r => 
+          r.date === realIndex.date && 
+          r.amount === realIndex.amount && 
+          r.category === realIndex.category
+        );
+
+        if (originalIndex !== -1) {
+          originalRecords.splice(originalIndex, 1);
+          localStorage.setItem("transactions", JSON.stringify(originalRecords));
+        }
+
         loadRecords();
-        updateBalances();   // ana sayfadaki bakiyeyi de güncelle
+        updateBalances();
       }
     };
 
