@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kategori Yönetimi</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 30px; 
+            background: #f4f4f4; 
+        }
+        h1 { color: #333; text-align: center; }
+        form { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            max-width: 500px; 
+            margin: 20px auto; 
+        }
+        input, select, button { 
+            padding: 12px; 
+            margin: 10px 0; 
+            width: 100%; 
+            border: 1px solid #ccc; 
+            border-radius: 6px; 
+            box-sizing: border-box; 
+            font-size: 16px;
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        button:hover { background: #0056b3; }
+        ul { 
+            list-style: none; 
+            padding: 0; 
+            max-width: 500px; 
+            margin: 20px auto; 
+        }
+        li { 
+            background: white; 
+            padding: 15px; 
+            margin: 8px 0; 
+            border-radius: 8px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05); 
+        }
+        .gelir { border-left: 6px solid #28a745; }
+        .gider { border-left: 6px solid #dc3545; }
+        .transfer { border-left: 6px solid #17a2b8; }
+        .sil-btn { 
+            background: #dc3545; 
+            color: white; 
+            border: none; 
+            padding: 8px 14px; 
+            cursor: pointer; 
+            border-radius: 4px; 
+        }
+        .sil-btn:hover { background: #c82333; }
+    </style>
+</head>
+<body>
+    <h1>📂 Kategori Yönetimi</h1>
+
+    <!-- Kategori Ekleme Formu -->
+    <form id="kategoriForm">
+        <h2>Yeni Kategori Ekle</h2>
+        <input type="text" id="kategoriAdi" placeholder="Kategori adı girin (ör: Maaş, Market, Kira)" required>
+        
+        <select id="kategoriTipi" required>
+            <option value="">Kategori Tipini Seçin</option>
+            <option value="gelir">Gelir (+)</option>
+            <option value="gider">Gider (-)</option>
+            <option value="transfer">Transfer (↔)</option>
+        </select>
+        
+        <button type="submit">Kategori Oluştur</button>
+    </form>
+
+    <h2 style="text-align:center;">Mevcut Kategoriler</h2>
+    <ul id="kategoriListesi"></ul>
+
+    <script>
+        let kategoriler = JSON.parse(localStorage.getItem('kategoriler')) || [];
+
+        function listeleriGuncelle() {
+            const liste = document.getElementById('kategoriListesi');
+            liste.innerHTML = '';
+
+            kategoriler.forEach((kat, index) => {
+                const li = document.createElement('li');
+                li.className = kat.tip;
+                li.innerHTML = `
+                    <span><strong>${kat.ad}</strong> — ${kat.tip.toUpperCase()}</span>
+                    <button class="sil-btn" onclick="kategoriSil(${index})">Sil</button>
+                `;
+                liste.appendChild(li);
+            });
+        }
+
+        // Form submit
+        document.getElementById('kategoriForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const ad = document.getElementById('kategoriAdi').value.trim();
+            const tip = document.getElementById('kategoriTipi').value;
+
+            if (ad === '' || tip === '') {
+                alert('❌ Kategori adı ve tipi doldurulmalıdır!');
+                return;
+            }
+
+            if (kategoriler.some(k => k.ad === ad)) {
+                alert('❌ Bu isimde bir kategori zaten mevcut!');
+                return;
+            }
+
+            kategoriler.push({ ad: ad, tip: tip });
+            localStorage.setItem('kategoriler', JSON.stringify(kategoriler));
+
+            document.getElementById('kategoriAdi').value = '';
+            document.getElementById('kategoriTipi').value = '';
+
+            listeleriGuncelle();
+            alert('✅ Kategori başarıyla eklendi!');
+        });
+
+        // Kategori silme
+        window.kategoriSil = function(index) {
+            if (confirm('Bu kategoriyi silmek istediğinize emin misiniz?')) {
+                kategoriler.splice(index, 1);
+                localStorage.setItem('kategoriler', JSON.stringify(kategoriler));
+                listeleriGuncelle();
+            }
+        };
+
+        // Sayfa yüklendiğinde listeyi göster
+        listeleriGuncelle();
+    </script>
+</body>
+</html>
