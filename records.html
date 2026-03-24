@@ -2,72 +2,110 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kayıtlar</title>
   <link rel="stylesheet" href="style.css">
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 15px;
+      background: #f8f9fa;
     }
-
+    h1 {
+      text-align: center;
+      color: #007bff;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-
     th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+      border: 1px solid #ddd;
+      padding: 10px;
       text-align: center;
+      font-size: 15px;
     }
-
     th {
-      background-color: #f2f2f2;
+      background-color: #007bff;
+      color: white;
     }
-
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
     .actions button {
+      padding: 6px 12px;
       margin: 2px;
-      padding: 5px 10px;
-      font-size: 12px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
     }
-
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+    }
+    .delete-btn:hover {
+      background: #c82333;
+    }
+    #emptyMessage {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+      margin-top: 30px;
+    }
     nav.menu {
-      margin-top: 20px;
+      margin-top: 30px;
       display: flex;
       flex-direction: column;
+      gap: 10px;
     }
-
     nav.menu a {
-      margin: 5px 0;
-      padding: 10px;
+      padding: 12px;
       text-align: center;
       background: #007bff;
       color: white;
       text-decoration: none;
-      border-radius: 5px;
+      border-radius: 6px;
     }
-
-    nav.menu a:hover {
-      background: #0056b3;
-    }
-
-    #emptyMessage {
-      margin-top: 20px;
-      text-align: center;
-      color: gray;
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr {
+        position: absolute;
+        top: -9999px;
+        left: -9999px;
+      }
+      tr {
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+      }
+      td {
+        border: none;
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+      }
+      td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+        color: #007bff;
+      }
     }
   </style>
 </head>
-
 <body>
-  <h1>Kayıtlar</h1>
+  <h1>📋 Tüm Kayıtlar</h1>
 
-  <table>
+  <table id="recordsTable">
     <thead>
       <tr>
         <th>Tarih</th>
@@ -81,11 +119,10 @@
         <th>İşlemler</th>
       </tr>
     </thead>
-
     <tbody id="recordsList"></tbody>
   </table>
 
-  <div id="emptyMessage"></div>
+  <div id="emptyMessage">Henüz hiç kayıt yok.</div>
 
   <nav class="menu">
     <a href="index.html">Ana Sayfa</a>
@@ -97,36 +134,59 @@
   <script src="app.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    function loadRecords() {
       const records = JSON.parse(localStorage.getItem("transactions")) || [];
-      const table = document.getElementById("recordsList");
+      const tbody = document.getElementById("recordsList");
       const emptyMsg = document.getElementById("emptyMessage");
+      const table = document.getElementById("recordsTable");
+
+      tbody.innerHTML = "";
 
       if (records.length === 0) {
-        emptyMsg.textContent = "Henüz kayıt yok.";
+        emptyMsg.style.display = "block";
+        table.style.display = "none";
         return;
       }
 
-      records.forEach((rec, i) => {
+      emptyMsg.style.display = "none";
+      table.style.display = "table";
+
+      records.forEach((rec, index) => {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-          <td>${rec.date || "-"}</td>
-          <td>${rec.type || "-"}</td>
-          <td>${rec.category || "-"}</td>
-          <td>${rec.note || "-"}</td>
-          <td>${rec.amount || 0}</td>
-          <td>${rec.accountId || "-"}</td>
-          <td>${rec.installments || "-"}</td>
-          <td>${rec.dueDate || "-"}</td>
-          <td class="actions">
-            <button onclick="deleteRecord(${i})">Sil</button>
+          <td data-label="Tarih">${rec.date || "-"}</td>
+          <td data-label="Tür">${rec.type || "-"}</td>
+          <td data-label="Kategori">${rec.category || "-"}</td>
+          <td data-label="Açıklama">${rec.note || "-"}</td>
+          <td data-label="Tutar" style="font-weight:bold; color:${rec.type === 'Gelir' ? '#28a745' : '#dc3545'}">
+            ${rec.amount ? Number(rec.amount).toLocaleString('tr-TR') + ' ₺' : '0 ₺'}
+          </td>
+          <td data-label="Hesap/Kart">${rec.account || "-"}</td>
+          <td data-label="Taksit">${rec.installments || "-"}</td>
+          <td data-label="Son Ödeme">${rec.dueDate || "-"}</td>
+          <td class="actions" data-label="İşlemler">
+            <button class="delete-btn" onclick="deleteRecord(${index})">Sil</button>
           </td>
         `;
 
-        table.appendChild(row);
+        tbody.appendChild(row);
       });
-    });
+    }
+
+    // Sayfa yüklendiğinde kayıtları göster
+    document.addEventListener("DOMContentLoaded", loadRecords);
+
+    // Silme fonksiyonu (app.js'ten de çağrılabilecek)
+    window.deleteRecord = function(index) {
+      if (confirm("Bu kaydı silmek istediğinden emin misin?")) {
+        let records = JSON.parse(localStorage.getItem("transactions")) || [];
+        records.splice(index, 1);
+        localStorage.setItem("transactions", JSON.stringify(records));
+        loadRecords();   // tabloyu yenile
+        // İstersen index.html'deki bakiyeleri de yenileyebiliriz
+      }
+    };
   </script>
 </body>
 </html>
