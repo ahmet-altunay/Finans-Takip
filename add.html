@@ -65,40 +65,25 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // === HESAP / KART DOLDUR (doğrudan burada) ===
-      function loadAccountsDropdown() {
-        const select = document.getElementById("account");
-        select.innerHTML = '<option value="">Hesap / Kart seçin...</option>';
+      // Hesapları doldur
+      populateAccounts();
 
-        const accountsList = JSON.parse(localStorage.getItem("accounts")) || [];
-
-        if (accountsList.length === 0) {
-          const opt = document.createElement("option");
-          opt.value = "";
-          opt.textContent = "Henüz hesap eklenmedi";
-          select.appendChild(opt);
-          return;
-        }
-
-        accountsList.forEach(acc => {
-          const opt = document.createElement("option");
-          opt.value = acc.name;
-          opt.textContent = `${acc.name} (${acc.type})`;
-          select.appendChild(opt);
-        });
-      }
-
-      loadAccountsDropdown();   // ← Bu satır çok önemli
-
-      // Diğer fonksiyonlar
+      // Kategorileri doldur
       populateCategories();
+
+      // Tür değiştiğinde kategorileri yenile
       document.getElementById("type").addEventListener("change", populateCategories);
 
+      // Yeni kategori
       document.getElementById("addCategoryBtn").addEventListener("click", () => {
         document.getElementById("newCategoryDiv").style.display = "block";
       });
       document.getElementById("saveCategoryBtn").addEventListener("click", addNewCategory);
+
+      // Form kaydet
       document.getElementById("transactionForm").addEventListener("submit", addTransaction);
+
+      // CSV yükle
       document.getElementById("csvBtn").addEventListener("click", importCSV);
 
       // Düzenleme modu
