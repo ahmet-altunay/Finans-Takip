@@ -41,7 +41,7 @@
       font-weight: bold;
       color: black;
     }
-    .month-cell {
+    .category-cell {
       text-align: left;
       font-weight: bold;
       background: #f0f8ff;
@@ -110,6 +110,7 @@
 
       const sortedMonths = Object.keys(monthly).sort();
 
+<<<<<<< HEAD
       // ===================== GELİR =====================
       let gelirHTML = `<table><tr><th>Ay</th>`;
       const gelirCats = new Set();
@@ -128,9 +129,38 @@
           rowTotal += val;
         });
         gelirHTML += `<td style="background:#d4edda; font-weight:bold">${rowTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr>`;
+=======
+      // ===== GELİR RAPORU =====
+      let gelirHTML = `<table><tr><th>Kategori</th>`;
+      sortedMonths.forEach(m => {
+        gelirHTML += `<th>${m}</th>`;
+      });
+      gelirHTML += `<th style="background:#d4edda;">Toplam</th></tr>`;
+
+      const gelirCategories = new Set();
+      sortedMonths.forEach(m => {
+        Object.keys(monthly[m].Gelir).forEach(c => gelirCategories.add(c));
+      });
+
+      let totalGelirByCat = {};
+      let grandTotalGelir = 0;
+
+      Array.from(gelirCategories).sort().forEach(cat => {
+        gelirHTML += `<tr><td class="category-cell">${cat}</td>`;
+        let catTotal = 0;
+        sortedMonths.forEach(month => {
+          const val = monthly[month].Gelir[cat] || 0;
+          gelirHTML += `<td>${val.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+          catTotal += val;
+        });
+        gelirHTML += `<td style="background:#d4edda; font-weight:bold">${catTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr>`;
+        totalGelirByCat[cat] = catTotal;
+        grandTotalGelir += catTotal;
+>>>>>>> ac233cc28329cd0bd4a2afc5501d38eb0396cc0f
       });
 
       gelirHTML += `<tr class="grand-total"><td><strong>TOPLAM</strong></td>`;
+<<<<<<< HEAD
       Array.from(gelirCats).sort().forEach(cat => {
         gelirHTML += `<td style="font-weight:bold">${(totalGelir[cat] || 0).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
       });
@@ -191,6 +221,96 @@
         transferHTML += `<td style="font-weight:bold">${(totalTransfer[cat] || 0).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
       });
       transferHTML += `<td style="font-weight:bold; background:#d1ecf1;">${Object.values(totalTransfer).reduce((a,b)=>a+b,0).toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr></table>`;
+=======
+      sortedMonths.forEach(m => {
+        let monthTotal = 0;
+        Array.from(gelirCategories).forEach(cat => {
+          monthTotal += monthly[m].Gelir[cat] || 0;
+        });
+        gelirHTML += `<td style="font-weight:bold">${monthTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+      });
+      gelirHTML += `<td style="font-weight:bold; background:#d4edda;">${grandTotalGelir.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr></table>`;
+
+      document.getElementById("gelirReport").innerHTML = gelirHTML;
+
+      // ===== GİDER RAPORU =====
+      let giderHTML = `<table><tr><th>Kategori</th>`;
+      sortedMonths.forEach(m => {
+        giderHTML += `<th>${m}</th>`;
+      });
+      giderHTML += `<th style="background:#f8d7da;">Toplam</th></tr>`;
+
+      const giderCategories = new Set();
+      sortedMonths.forEach(m => {
+        Object.keys(monthly[m].Gider).forEach(c => giderCategories.add(c));
+      });
+
+      let totalGiderByCat = {};
+      let grandTotalGider = 0;
+
+      Array.from(giderCategories).sort().forEach(cat => {
+        giderHTML += `<tr><td class="category-cell">${cat}</td>`;
+        let catTotal = 0;
+        sortedMonths.forEach(month => {
+          const val = monthly[month].Gider[cat] || 0;
+          giderHTML += `<td>${val.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+          catTotal += val;
+        });
+        giderHTML += `<td style="background:#f8d7da; font-weight:bold">${catTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr>`;
+        totalGiderByCat[cat] = catTotal;
+        grandTotalGider += catTotal;
+      });
+
+      giderHTML += `<tr class="grand-total"><td><strong>TOPLAM</strong></td>`;
+      sortedMonths.forEach(m => {
+        let monthTotal = 0;
+        Array.from(giderCategories).forEach(cat => {
+          monthTotal += monthly[m].Gider[cat] || 0;
+        });
+        giderHTML += `<td style="font-weight:bold">${monthTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+      });
+      giderHTML += `<td style="font-weight:bold; background:#f8d7da;">${grandTotalGider.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr></table>`;
+
+      document.getElementById("giderReport").innerHTML = giderHTML;
+
+      // ===== TRANSFER RAPORU =====
+      let transferHTML = `<table><tr><th>Kategori</th>`;
+      sortedMonths.forEach(m => {
+        transferHTML += `<th>${m}</th>`;
+      });
+      transferHTML += `<th style="background:#d1ecf1;">Toplam</th></tr>`;
+
+      const transferCategories = new Set();
+      sortedMonths.forEach(m => {
+        Object.keys(monthly[m].Transfer).forEach(c => transferCategories.add(c));
+      });
+
+      let totalTransferByCat = {};
+      let grandTotalTransfer = 0;
+
+      Array.from(transferCategories).sort().forEach(cat => {
+        transferHTML += `<tr><td class="category-cell">${cat}</td>`;
+        let catTotal = 0;
+        sortedMonths.forEach(month => {
+          const val = monthly[month].Transfer[cat] || 0;
+          transferHTML += `<td>${val.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+          catTotal += val;
+        });
+        transferHTML += `<td style="background:#d1ecf1; font-weight:bold">${catTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr>`;
+        totalTransferByCat[cat] = catTotal;
+        grandTotalTransfer += catTotal;
+      });
+
+      transferHTML += `<tr class="grand-total"><td><strong>TOPLAM</strong></td>`;
+      sortedMonths.forEach(m => {
+        let monthTotal = 0;
+        Array.from(transferCategories).forEach(cat => {
+          monthTotal += monthly[m].Transfer[cat] || 0;
+        });
+        transferHTML += `<td style="font-weight:bold">${monthTotal.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td>`;
+      });
+      transferHTML += `<td style="font-weight:bold; background:#d1ecf1;">${grandTotalTransfer.toLocaleString('tr-TR', {minimumFractionDigits: 2})} ₺</td></tr></table>`;
+>>>>>>> ac233cc28329cd0bd4a2afc5501d38eb0396cc0f
 
       document.getElementById("transferReport").innerHTML = transferHTML;
     }

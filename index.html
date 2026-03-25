@@ -3,11 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💰 Finans Takip Sistemi</title>
+  <title>💰 AA-PerFin Tracking</title>
   <link rel="stylesheet" href="style.css">
+  
+  <!-- Firebase SDK (compat version - daha basit) -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+  
+  <script>
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBpj6bp0ByjqQxkeh5IjVPpaO_uRjL5wf8",
+      authDomain: "aa-perfin-tracking.firebaseapp.com",
+      projectId: "aa-perfin-tracking",
+      storageBucket: "aa-perfin-tracking.firebasestorage.app",
+      messagingSenderId: "458478156365",
+      appId: "1:458478156365:web:fece7b6affdf3b8fa37a04"
+    };
+
+    // Firebase Başlat
+    firebase.initializeApp(firebaseConfig);
+    
+    // Global olarak tanımla
+    window.db = firebase.firestore();
+    window.auth = firebase.auth();
+    
+    console.log("✅ Firebase başarıyla başlatıldı!");
+  </script>
 </head>
 <body>
-  <h1>💰 Finans Takip Sistemi</h1>
+  <h1>💰 AA-PerFin Tracking</h1>
   
   <div id="date"></div>
   <div id="clock"></div>
