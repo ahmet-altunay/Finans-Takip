@@ -5,8 +5,30 @@ let kategoriler = [];
 let isOnline = navigator.onLine;
 
 // Firebase referansları (index.html'den global olarak tanımlanmış)
-const db = window.db;
-const auth = window.auth;
+let db = null;
+let auth = null;
+
+// Firebase hazır olana kadar bekle
+function waitForFirebase() {
+  return new Promise((resolve) => {
+    const checkInterval = setInterval(() => {
+      if (window.db && window.auth) {
+        db = window.db;
+        auth = window.auth;
+        clearInterval(checkInterval);
+        console.log("✅ Firebase referansları alındı!");
+        resolve();
+      }
+    }, 100);
+    
+    // 5 saniye sonra timeout
+    setTimeout(() => {
+      clearInterval(checkInterval);
+      console.warn("⚠️ Firebase yüklenemedi, LocalStorage kullanılacak");
+      resolve();
+    }, 5000);
+  });
+}
 
 // ===================== SAAT ve TARİH =====================
 function startClock() {
@@ -44,6 +66,12 @@ function updateBalances() {
 
 // ===================== FIRESTORE'DAN VERİ ÇEK =====================
 async function syncFromFirebase() {
+  if (!db) {
+    console.warn("⚠️ Firebase hazır değil, LocalStorage kullanılıyor");
+    loadFromLocalStorage();
+    return false;
+  }
+
   try {
     // Transactions
     const transSnapshot = await db.collection('transactions').get();
@@ -132,7 +160,7 @@ async function addNewCategory() {
   localStorage.setItem("kategoriler", JSON.stringify(kategoriler));
 
   // Firebase'e gönder
-  if (isOnline) {
+  if (isOnline && db) {
     try {
       await db.collection('kategoriler').add(newCategory);
       console.log("✅ Kategori Firebase'e gönderildi");
@@ -170,7 +198,7 @@ async function addTransaction(e) {
   localStorage.setItem("transactions", JSON.stringify(transactions));
 
   // Firebase'e gönder
-  if (isOnline) {
+  if (isOnline && db) {
     try {
       await db.collection('transactions').add(record);
       console.log("✅ İşlem Firebase'e gönderildi");
@@ -222,7 +250,7 @@ async function importCSV() {
   localStorage.setItem("transactions", JSON.stringify(transactions));
   
   // Firebase'e gönder
-  if (isOnline) {
+  if (isOnline && db) {
     for (let trans of transactions) {
       try {
         await db.collection('transactions').add(trans);
@@ -263,7 +291,7 @@ function populateAccounts() {
 window.addEventListener('online', () => {
   isOnline = true;
   console.log("🌐 İnternet bağlantısı kuruldu - Senkronizasyon başlıyor...");
-  syncFromFirebase();
+  if (db) syncFromFirebase();
 });
 
 window.addEventListener('offline', () => {
@@ -274,6 +302,9 @@ window.addEventListener('offline', () => {
 // ===================== SAYFA YÜKLENDİĞİNDE ÇALIŞACAK KISIM =====================
 document.addEventListener("DOMContentLoaded", async () => {
   startClock();
+  
+  // Firebase hazır olana kadar bekle
+  await waitForFirebase();
   
   // İlk yükleme: Firebase'den çek, başarısız olursa LocalStorage'dan yükle
   const synced = await syncFromFirebase();
@@ -308,7 +339,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // ===================== HER 30 SANİYE SİNKRONİZASYON =====================
 setInterval(() => {
-  if (isOnline) {
+  if (isOnline && db) {
     syncFromFirebase().catch(error => console.warn("Periyodik senkronizasyon hatası:", error));
   }
 }, 30000);
