@@ -4,7 +4,7 @@ let accounts = [];
 let kategoriler = [];
 let isOnline = navigator.onLine;
 
-// Firebase referansları (index.html'den global olarak tanımlanmış)
+// Firebase referansları
 let db = null;
 let auth = null;
 
@@ -12,7 +12,7 @@ let auth = null;
 function waitForFirebase() {
   return new Promise((resolve) => {
     const checkInterval = setInterval(() => {
-      if (window.db && window.auth) {
+      if (window.db) {
         db = window.db;
         auth = window.auth;
         clearInterval(checkInterval);
