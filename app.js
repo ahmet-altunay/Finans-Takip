@@ -1,9 +1,8 @@
-// ===================== app.js - TAM VE KESİN SENKRONİZE VERSİYON =====================
+// ===================== app.js - KESİN SENKRONİZE VERSİYON =====================
 
 const firebaseConfig = {
   apiKey: "AIzaSyDRz_pRfHM7AGTz4c21bQhtg9DxCqlb2ek",
   authDomain: "aa-perfin-tracking-d33b8.firebaseapp.com",
-  // AVRUPA BÖLGESİ GÜNCEL URL:
   databaseURL: "https://aa-perfin-tracking-d33b8-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "aa-perfin-tracking-d33b8",
   storageBucket: "aa-perfin-tracking-d33b8.firebasestorage.app",
@@ -11,42 +10,24 @@ const firebaseConfig = {
   appId: "1:374462035684:web:f30fc6f0de73477826def1"
 };
 
+// Global Değişkenler
 let db;
 let transactions = [];
 let accounts = [];
 let kategoriler = [];
 
-// Kütüphanelerin sırayla yüklendiğinden emin olan fonksiyon
-const loadFirebaseLibraries = () => {
-  const s1 = document.createElement('script');
-  s1.src = "https://www.gstatic.com";
-  
-  s1.onload = () => {
-    const s2 = document.createElement('script');
-    s2.src = "https://www.gstatic.com";
-    
-    s2.onload = () => {
-      // Kütüphaneler tam yüklendi, şimdi başlatıyoruz
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
-      db = firebase.database();
-      console.log("✅ Firebase (Europe) Hazır ve Senkronize!");
-      loadDataFromFirebase();
-    };
-    document.head.appendChild(s2);
-  };
-  document.head.appendChild(s1);
-};
+// Firebase Başlatma
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+db = firebase.database();
 
-// ===================== VERİ YÜKLEME (GERÇEK ZAMANLI) =====================
+// ===================== VERİ YÜKLEME (SENKRONİZASYON) =====================
 function loadDataFromFirebase() {
-  // .on('value') metodu bilgisayarda değişen veriyi anında telefona çeker
   db.ref('transactions').on('value', (snapshot) => {
     const val = snapshot.val();
     transactions = val ? Object.values(val) : [];
-    updateBalances();
-    if (typeof loadRecords === "function") loadRecords();
+    if (typeof updateBalances === "function") updateBalances();
   });
 
   db.ref('accounts').on('value', (snapshot) => {
@@ -65,44 +46,11 @@ function loadDataFromFirebase() {
 // ===================== VERİ KAYDETME =====================
 function saveTransactions() { db.ref('transactions').set(transactions); }
 function saveAccounts() { db.ref('accounts').set(accounts); }
-function saveKategoriler() { 
-  db.ref('kategoriler').set(kategoriler)
-    .then(() => console.log("☁️ Senkronizasyon başarılı"))
-    .catch(err => console.error("❌ Hata:", err));
-}
+function saveKategoriler() { db.ref('kategoriler').set(kategoriler); }
 
-// ===================== YARDIMCI FONKSİYONLAR =====================
-function startClock() {
-  const update = () => {
-    const now = new Date();
-    const d = document.getElementById("date");
-    const c = document.getElementById("clock");
-    if(d) d.textContent = now.toLocaleDateString("tr-TR", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-    if(c) c.textContent = now.toLocaleTimeString("tr-TR");
-  };
-  update();
-  setInterval(update, 1000);
-}
-
-function updateBalances() {
-  let inc = 0, exp = 0;
-  transactions.forEach(t => {
-    const val = parseFloat(t.amount) || 0;
-    t.type === "Gelir" ? inc += val : exp += val;
-  });
-  
-  const ti = document.getElementById("total-income");
-  const te = document.getElementById("total-expense");
-  const tb = document.getElementById("total-balance");
-
-  if(ti) ti.textContent = inc.toLocaleString('tr-TR') + " ₺";
-  if(te) te.textContent = exp.toLocaleString('tr-TR') + " ₺";
-  if(tb) tb.textContent = (inc - exp).toLocaleString('tr-TR') + " ₺";
-}
-
+// ===================== LİSTELEME FONKSİYONLARI =====================
 function populateCategories() {
-  const typeSelect = document.getElementById("type");
-  const type = typeSelect ? typeSelect.value : "Gider";
+  const type = document.getElementById("type")?.value || "Gider";
   const select = document.getElementById("category");
   if (!select) return;
 
@@ -114,39 +62,10 @@ function populateCategories() {
   });
 }
 
-function addNewCategory() {
-  const input = document.getElementById("newCategory");
-  const name = input?.value.trim();
-  if (!name) return alert("İsim giriniz!");
-  
-  const type = document.getElementById("type").value.toLowerCase();
-  if (kategoriler.some(k => k.ad === name)) return alert("Bu kategori zaten mevcut!");
-
-  kategoriler.push({ ad: name, tip: type });
-  saveKategoriler(); // Buluta gönderir
-  input.value = "";
-}
-
-// Sayfa Başlatıcı
-document.addEventListener("DOMContentLoaded", () => {
-  startClock();
-  loadFirebaseLibraries();
-});
-// ===================== HESAPLARI LİSTELEME FONKSİYONU =====================
 function populateAccounts() {
-  const select = document.getElementById("account"); // HTML'deki select id'si
-  if (!select) return; 
-
+  const select = document.getElementById("account");
+  if (!select) return;
   select.innerHTML = '<option value="">Hesap / Kart seçin...</option>';
-
-  if (accounts.length === 0) {
-    const opt = document.createElement("option");
-    opt.textContent = "Henüz hesap eklenmedi";
-    select.appendChild(opt);
-    return;
-  }
-
-  // Firebase'den gelen 'accounts' dizisini döngüye sokar
   accounts.forEach(acc => {
     const opt = document.createElement("option");
     opt.value = acc.name;
@@ -155,4 +74,45 @@ function populateAccounts() {
   });
 }
 
+// ===================== EKLEME FONKSİYONLARI =====================
+function addNewCategory() {
+  const name = document.getElementById("newCategory")?.value.trim();
+  const type = document.getElementById("type")?.value.toLowerCase();
+  if (!name) return alert("İsim giriniz!");
+  if (kategoriler.some(k => k.ad === name)) return alert("Mevcut!");
 
+  kategoriler.push({ ad: name, tip: type });
+  saveKategoriler();
+  document.getElementById("newCategory").value = "";
+}
+
+function addTransaction(e) {
+  e.preventDefault();
+  const record = {
+    id: Date.now().toString(),
+    date: document.getElementById("dateInput").value,
+    type: document.getElementById("type").value,
+    category: document.getElementById("category").value,
+    note: document.getElementById("note").value || "",
+    amount: parseFloat(document.getElementById("amount").value),
+    account: document.getElementById("account").value || "Nakit",
+    timestamp: Date.now()
+  };
+  transactions.push(record);
+  saveTransactions();
+  alert("✅ Kayıt eklendi!");
+  e.target.reset();
+}
+
+// Saati başlat ve Verileri çek
+function startClock() {
+  setInterval(() => {
+    const now = new Date();
+    if(document.getElementById("date")) document.getElementById("date").textContent = now.toLocaleDateString("tr-TR");
+    if(document.getElementById("clock")) document.getElementById("clock").textContent = now.toLocaleTimeString("tr-TR");
+  }, 1000);
+}
+
+// BAŞLATICI
+loadDataFromFirebase();
+startClock();
