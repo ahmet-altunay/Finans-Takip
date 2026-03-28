@@ -66,6 +66,14 @@ function saveKategoriler() {
   db.ref('kategoriler').set(kategoriler);
 }
 
+function saveKategoriler() {
+  // Veriyi Firebase'e gönderiyoruz, telefon 'on.value' ile bunu otomatik yakalayacak
+  db.ref('kategoriler').set(kategoriler)
+    .then(() => console.log("Kategoriler bulutla eşitlendi"))
+    .catch(err => console.error("Firebase hata:", err));
+}
+
+
 // ===================== DİĞER FONKSİYONLAR (Kısaltılmış) =====================
 function startClock() {
   function update() {
