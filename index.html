@@ -3,35 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>💰 AA-PerFin Tracking</title>
+  <title>💰 Finans Takip</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="data:,">
-  <!-- Firebase SDK (compat version - daha basit) -->
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
-  
+  <script src="https://www.gstatic.com"></script>
+  <script src="https://www.gstatic.com"></script>
 </head>
 <body>
   <h1>💰 AA-PerFin Tracking</h1>
-  
-  <div id="date"></div>
-  <div id="clock"></div>
-
-  <div id="balances" class="balances-box">
-    <p><strong>Toplam Bakiye:</strong> <span id="total-balance">0,00 ₺</span></p>
-    <p>Gelir: <span id="total-income" style="color:#28a745;">0,00 ₺</span> | 
-       Gider: <span id="total-expense" style="color:#dc3545;">0,00 ₺</span></p>
+  <div id="balances">
+    <p>Toplam Bakiye: <span id="total-balance">0,00 ₺</span></p>
+    <p>Gelir: <span id="total-income" style="color:green;">0,00 ₺</span> | Gider: <span id="total-expense" style="color:red;">0,00 ₺</span></p>
   </div>
-
   <nav class="menu">
     <a href="add.html">📌 Yeni Kayıt Ekle</a>
-    <a href="records.html">📋 Tüm Kayıtlar</a>
-    <a href="report.html">📊 Raporlar</a>
-    <a href="accounts.html">💳 Hesap / Kartlar</a>
     <a href="category.html">📂 Kategori Yönetimi</a>
   </nav>
-
   <script src="app.js"></script>
 </body>
 </html>
