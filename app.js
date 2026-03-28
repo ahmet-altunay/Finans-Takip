@@ -132,3 +132,27 @@ document.addEventListener("DOMContentLoaded", () => {
   startClock();
   loadFirebaseLibraries();
 });
+// ===================== HESAPLARI LİSTELEME FONKSİYONU =====================
+function populateAccounts() {
+  const select = document.getElementById("account"); // HTML'deki select id'si
+  if (!select) return; 
+
+  select.innerHTML = '<option value="">Hesap / Kart seçin...</option>';
+
+  if (accounts.length === 0) {
+    const opt = document.createElement("option");
+    opt.textContent = "Henüz hesap eklenmedi";
+    select.appendChild(opt);
+    return;
+  }
+
+  // Firebase'den gelen 'accounts' dizisini döngüye sokar
+  accounts.forEach(acc => {
+    const opt = document.createElement("option");
+    opt.value = acc.name;
+    opt.textContent = `${acc.name} (${acc.type})`;
+    select.appendChild(opt);
+  });
+}
+
+
