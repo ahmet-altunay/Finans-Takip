@@ -1,9 +1,9 @@
-// ===================== app.js - TAM SENKRONİZE VERSİYON =====================
+// ===================== app.js - TAM VE KESİN SENKRONİZE VERSİYON =====================
 
 const firebaseConfig = {
   apiKey: "AIzaSyDRz_pRfHM7AGTz4c21bQhtg9DxCqlb2ek",
   authDomain: "aa-perfin-tracking-d33b8.firebaseapp.com",
-  // Hata mesajındaki doğru Avrupa sunucu adresi tanımlandı:
+  // AVRUPA BÖLGESİ GÜNCEL URL:
   databaseURL: "https://aa-perfin-tracking-d33b8-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "aa-perfin-tracking-d33b8",
   storageBucket: "aa-perfin-tracking-d33b8.firebasestorage.app",
@@ -11,40 +11,37 @@ const firebaseConfig = {
   appId: "1:374462035684:web:f30fc6f0de73477826def1"
 };
 
-// Global Değişkenler
 let db;
 let transactions = [];
 let accounts = [];
 let kategoriler = [];
 
-// Firebase SDK'larını dinamik ve güvenli yükleme
-const loadFirebase = () => {
-  if (typeof firebase !== 'undefined') return initializeFirebase();
-
+// Kütüphanelerin sırayla yüklendiğinden emin olan fonksiyon
+const loadFirebaseLibraries = () => {
   const s1 = document.createElement('script');
   s1.src = "https://www.gstatic.com";
+  
   s1.onload = () => {
     const s2 = document.createElement('script');
     s2.src = "https://www.gstatic.com";
-    s2.onload = initializeFirebase;
+    
+    s2.onload = () => {
+      // Kütüphaneler tam yüklendi, şimdi başlatıyoruz
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+      db = firebase.database();
+      console.log("✅ Firebase (Europe) Hazır ve Senkronize!");
+      loadDataFromFirebase();
+    };
     document.head.appendChild(s2);
   };
   document.head.appendChild(s1);
 };
 
-function initializeFirebase() {
-  // Mükerrer başlatmayı önle
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  db = firebase.database();
-  console.log("✅ Firebase (Europe) Senkronizasyonu Aktif");
-  loadDataFromFirebase();
-}
-
 // ===================== VERİ YÜKLEME (GERÇEK ZAMANLI) =====================
 function loadDataFromFirebase() {
-  // .on('value') sayesinde bir cihazda değişen veri diğerinde anında görünür
+  // .on('value') metodu bilgisayarda değişen veriyi anında telefona çeker
   db.ref('transactions').on('value', (snapshot) => {
     const val = snapshot.val();
     transactions = val ? Object.values(val) : [];
@@ -70,11 +67,11 @@ function saveTransactions() { db.ref('transactions').set(transactions); }
 function saveAccounts() { db.ref('accounts').set(accounts); }
 function saveKategoriler() { 
   db.ref('kategoriler').set(kategoriler)
-    .then(() => console.log("☁️ Kategoriler buluta işlendi"))
-    .catch(err => console.error("❌ Kayıt hatası:", err));
+    .then(() => console.log("☁️ Senkronizasyon başarılı"))
+    .catch(err => console.error("❌ Hata:", err));
 }
 
-// ===================== FONKSİYONLAR =====================
+// ===================== YARDIMCI FONKSİYONLAR =====================
 function startClock() {
   const update = () => {
     const now = new Date();
@@ -104,7 +101,8 @@ function updateBalances() {
 }
 
 function populateCategories() {
-  const type = document.getElementById("type")?.value || "Gider";
+  const typeSelect = document.getElementById("type");
+  const type = typeSelect ? typeSelect.value : "Gider";
   const select = document.getElementById("category");
   if (!select) return;
 
@@ -122,15 +120,15 @@ function addNewCategory() {
   if (!name) return alert("İsim giriniz!");
   
   const type = document.getElementById("type").value.toLowerCase();
-  if (kategoriler.some(k => k.ad === name)) return alert("Mevcut!");
+  if (kategoriler.some(k => k.ad === name)) return alert("Bu kategori zaten mevcut!");
 
   kategoriler.push({ ad: name, tip: type });
-  saveKategoriler(); // Veriyi buluta gönderir, telefon otomatik çeker
+  saveKategoriler(); // Buluta gönderir
   input.value = "";
 }
 
 // Sayfa Başlatıcı
 document.addEventListener("DOMContentLoaded", () => {
   startClock();
-  loadFirebase();
+  loadFirebaseLibraries();
 });
