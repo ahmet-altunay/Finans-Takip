@@ -1,5 +1,4 @@
-// ===================== app.js - KESİN SENKRONİZE VERSİYON =====================
-
+// ===================== app.js - TAM SENKRONİZE VERSİYON =====================
 const firebaseConfig = {
   apiKey: "AIzaSyDRz_pRfHM7AGTz4c21bQhtg9DxCqlb2ek",
   authDomain: "aa-perfin-tracking-d33b8.firebaseapp.com",
@@ -50,7 +49,8 @@ function saveKategoriler() { db.ref('kategoriler').set(kategoriler); }
 
 // ===================== LİSTELEME FONKSİYONLARI =====================
 function populateCategories() {
-  const type = document.getElementById("type")?.value || "Gider";
+  const typeEl = document.getElementById("type");
+  const type = typeEl ? typeEl.value : "Gider";
   const select = document.getElementById("category");
   if (!select) return;
 
@@ -83,11 +83,11 @@ function addNewCategory() {
 
   kategoriler.push({ ad: name, tip: type });
   saveKategoriler();
-  document.getElementById("newCategory").value = "";
+  if(document.getElementById("newCategory")) document.getElementById("newCategory").value = "";
 }
 
 function addTransaction(e) {
-  e.preventDefault();
+  if(e) e.preventDefault();
   const record = {
     id: Date.now().toString(),
     date: document.getElementById("dateInput").value,
@@ -101,18 +101,19 @@ function addTransaction(e) {
   transactions.push(record);
   saveTransactions();
   alert("✅ Kayıt eklendi!");
-  e.target.reset();
+  if(e) e.target.reset();
 }
 
-// Saati başlat ve Verileri çek
-function startClock() {
-  setInterval(() => {
-    const now = new Date();
-    if(document.getElementById("date")) document.getElementById("date").textContent = now.toLocaleDateString("tr-TR");
-    if(document.getElementById("clock")) document.getElementById("clock").textContent = now.toLocaleTimeString("tr-TR");
-  }, 1000);
+// Bakiye ve Saat
+function updateBalances() {
+  let inc = 0, exp = 0;
+  transactions.forEach(t => {
+    const val = parseFloat(t.amount) || 0;
+    t.type === "Gelir" ? inc += val : exp += val;
+  });
+  if(document.getElementById("total-income")) document.getElementById("total-income").textContent = inc.toLocaleString('tr-TR') + " ₺";
+  if(document.getElementById("total-expense")) document.getElementById("total-expense").textContent = exp.toLocaleString('tr-TR') + " ₺";
+  if(document.getElementById("total-balance")) document.getElementById("total-balance").textContent = (inc - exp).toLocaleString('tr-TR') + " ₺";
 }
 
-// BAŞLATICI
 loadDataFromFirebase();
-startClock();
