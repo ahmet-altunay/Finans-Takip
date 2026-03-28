@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-   <meta charset="UTF-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Yeni Kayıt Ekle</title>
+  <title>📌 Yeni Kayıt Ekle</title>
   <link rel="stylesheet" href="style.css">
   
-  <!-- KÜTÜPHANELERİ BURAYA EKLE (HAYATİ ÖNEM TAŞIR) -->
+  <!-- KÜTÜPHANELER BURADA OLMALI (SIRALAMA ÖNEMLİ) -->
   <script src="https://www.gstatic.com"></script>
   <script src="https://www.gstatic.com"></script>
+  
   <style>
     #newCategoryDiv { display: none; margin-top: 10px; padding: 15px; background: #f0f0f0; border-radius: 8px; }
     #csvBtn {
@@ -54,59 +55,33 @@
     <button type="submit" style="margin-top:25px; padding:14px; font-size:17px;">✅ Kaydet</button>
   </form>
 
-  <h2>📥 Tüm Verileri CSV'den Yükle</h2>
-  <button id="csvBtn">📊 CSV Dosyasını Sisteme Yükle (169 kayıt)</button>
-
   <nav class="menu">
     <a href="index.html">Ana Sayfa</a>
     <a href="records.html">Kayıtlar</a>
-    <a href="report.html">Raporlar</a>
-    <a href="accounts.html">Hesap/Kartlar</a>
     <a href="category.html">Kategori Yönetimi</a>
   </nav>
 
+  <!-- KOD DOSYASI -->
   <script src="app.js"></script>
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Hesapları doldur
-      populateAccounts();
+      // Fonksiyonların ve Firebase'in hazır olmasını bekleyen güvenli başlatıcı
+      const checkReady = setInterval(() => {
+        if (typeof db !== "undefined" && typeof populateAccounts === "function") {
+          clearInterval(checkReady);
+          populateAccounts();
+          populateCategories();
+          console.log("✅ Firebase Verileri Hazır.");
+        }
+      }, 200);
 
-      // Kategorileri doldur
-      populateCategories();
-
-      // Tür değiştiğinde kategorileri yenile
       document.getElementById("type").addEventListener("change", populateCategories);
-
-      // Yeni kategori
       document.getElementById("addCategoryBtn").addEventListener("click", () => {
         document.getElementById("newCategoryDiv").style.display = "block";
       });
       document.getElementById("saveCategoryBtn").addEventListener("click", addNewCategory);
-
-      // Form kaydet
       document.getElementById("transactionForm").addEventListener("submit", addTransaction);
-
-      // CSV yükle
-      document.getElementById("csvBtn").addEventListener("click", importCSV);
-
-      // Düzenleme modu
-      const editData = localStorage.getItem("editRecord");
-      if (editData) {
-        const record = JSON.parse(editData);
-        document.getElementById("dateInput").value = record.date || "";
-        document.getElementById("type").value = record.type || "Gider";
-        document.getElementById("note").value = record.note || "";
-        document.getElementById("amount").value = record.amount || "";
-        document.getElementById("account").value = record.account || "";
-
-        setTimeout(() => {
-          populateCategories();
-          document.getElementById("category").value = record.category || "";
-        }, 100);
-
-        document.querySelector("h1").innerHTML = "📝 Kaydı Düzenle";
-      }
     });
   </script>
 </body>
